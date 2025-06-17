@@ -2,7 +2,8 @@ FROM ghcr.io/ietf-tools/xml2rfc-base:latest
 
 RUN apt-get -y update && apt-get -y install curl && apt-get -y clean
 
-#RUN bash -c curl -L https://raw.githubusercontent.com/metanorma/metanorma-linux-setup/master/ubuntu.sh | bash && curl -L https://raw.githubusercontent.com/metanorma/metanorma-linux-setup/master/install-gems.sh | bash
+# install metanorma
+RUN bash -c curl -L https://raw.githubusercontent.com/metanorma/metanorma-linux-setup/master/ubuntu.sh | bash && curl -L https://raw.githubusercontent.com/metanorma/metanorma-linux-setup/master/install-gems.sh | bash
 
 # Support Markdown
 RUN gem install kramdown-rfc
