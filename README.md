@@ -5,7 +5,7 @@ This repository contains the initial draft for mapping DNS data in the RPP (REST
 TODO
 
 ## Generating IETF I-D
-`draft-simmen-rpp-dns-data-mapping*.md` file is the source file to generate I-D.
+`draft-simmen-rpp-dns-data*.md` file is the source file to generate I-D.
 
 In order to generate I-D documents the following script [generate.sh](./generate.sh) is provided.
 
