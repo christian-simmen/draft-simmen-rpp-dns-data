@@ -96,7 +96,7 @@ management of dns data. For example FRED (CZ.NIC) is grouping name servers into 
 For all of the mentioned data is meant to be visible in DNS shifting from managing host objects to managing DNS data of a domain object will give an adavantage for adopting future resource record types as well covering current use cases.
 
 
-## Domain Names in DNS
+# Domain Names in DNS
 
 DNS domain names are hierarchically ordered label separated by a dot ".". Each label represent the delegation of a subordinate namespace or a host name. DNS resource records {{RFC1035}} are expressed as a dataset containing:
 
@@ -117,11 +117,11 @@ RDLENGTH  The length of the RDATA field. RDLENGTH will be safely ignored in RPP
 RDATA     The actual payload data. Structures defer for each type.
 
 
-## JSON representation
+# JSON representation
 
-### Rules
+## Rules
 
-#### Extending the RPP Domain object
+### Extending the RPP Domain object
 Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an array of DNS entries. The properties of an object in this array MUST be a representation of the top level format as described in section 3.2.1 of {{RFC1035}}. All keys MUST be lowercase. Whitespaces MUST be translated to underscores ("_").
 
 ~~~~
@@ -139,7 +139,7 @@ Delegation data, as well as DNSSEC data, is intended to find it's way into the p
     }
 ~~~~
 
-#### "name"
+### "name"
 
 The owner name of the DNS entry which MAY be the domain itself or a subordinate hostname. A server MUST NOT accept a NAME which is not a subordinate label to the provisioned domain name.
 
@@ -187,25 +187,25 @@ An A RR for "web.example.com" (FQDN) set to 3.3.3.3.
 
 
 
-##### "class"
+#### "class"
 
 A client SHOULD omit the class. The server MUST assume "IN" as class of a transferred dataset and MAY decline other values.
 If present the value MUST be chosen from section 3.2.4. CLASS values of {{RFC1035}}.
 
-##### "type"
+#### "type"
 
 The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
 If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} or other RFC describing the RR TYPE.
 
-##### "ttl"
+#### "ttl"
 
 A server MUST set a default value as TTL and MAY decline other values. A client SHOULD omit this value.
 
-##### "rdlength"
+#### "rdlength"
 
 RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A client MUST NOT include this field. A server MUST ignore this field if present.
 
-##### "rdata"
+#### "rdata"
 
 The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be translated to lowercase. Whitespaces MUST be translated to underscores ("_").
 
@@ -236,7 +236,7 @@ The resulting structure is therefore:
     }
 ~~~~
 
-#### Additional controls
+### Additional controls
 
 In addition to the regular data a server MAY allow a client to control specific operational behavior.
 A client MAY add an JSON object with a number of "controls" to the DNS dataset.
@@ -259,7 +259,7 @@ A client MAY add an JSON object with a number of "controls" to the DNS dataset.
     }
 ~~~~
 
-### Domain delegation
+## Domain delegation
 
 To enable domain delegation a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}},{{RFC3596}}).
 
@@ -325,7 +325,7 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
     }
 ~~~~
 
-### DNSSEC
+## DNSSEC
 
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
@@ -393,7 +393,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-#### Maximum signature lifetime
+### Maximum signature lifetime
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
 
 A client MAY add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server MAY ignore this value, e.g. for policy reasons.
@@ -433,7 +433,7 @@ A client MAY add maximum_signature_lifetime to the controls of an entry which is
     }
 ~~~~
 
-### Other DNS data
+## Other DNS data
 
 A server MAY support additional RR types, e.g. to support delegation-less provisioning.
 
@@ -503,11 +503,11 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 }
 ~~~~
 
-### Future DNS record types
+## Future DNS record types
 
 Future record types SHOULD be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.
 
-## Signaling supported record types
+# Signaling supported record types
 The server MUST provide a list of supported record types to the client.
 
 # Conventions and Definitions
