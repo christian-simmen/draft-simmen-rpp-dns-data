@@ -40,7 +40,7 @@ keyword:
 venue:
   group: WG
   type: Working Group
-  mail:	rpp@ietf.org
+  mail: rpp@ietf.org
   arch: https://mailarchive.ietf.org/arch/browse/rpp/
   github: christian-simmen/draft-simmen-rpp-dns-data
   latest: https://github.com/christian-simmen/draft-simmen-rpp-dns-data
@@ -74,7 +74,12 @@ informative:
 
 --- abstract
 
-This document proposes anrepresentation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document descripes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.
+This document proposes a representation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document describes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.
+
+EPP focused on distinct host objects containing data used for delegation purposes {{RFC5732}} and a separate extension focused on transferring DNSSEC relevant data {{RFC5910}}. Current registry system implementations improve these by grouping name servers into a nsset, or allowing domain provisioning without delegation. In addition new delegation mechanisms are developed {{I-D.draft-ietf-deleg}} to achieve a faster name resolution by providing properties of the child name server at delegation time.
+
+Regardless of the specific use case all of the above data is meant to become visible in DNS. For this a structure close to the targeted system (DNS) makes it easy to adopt to current and future developments.
+
 
 
 --- middle
@@ -82,11 +87,18 @@ This document proposes anrepresentation for various DNS data for use in the REST
 # Introduction
 
 In EPP host objects {{RFC5732}} are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS {{RFC8484}} or DNS over QUIC {{RFC9250}}. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type {{I-D.draft-ietf-deleg}} can be seen as an example.
+
 Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP {{RFC5910}}.
+
+Some current registry system implementations are further improving the
+management of dns data. For example FRED (CZ.NIC) is grouping name servers into name server sets. RRI (DENIC) provides an option to provision a delegation-less domain by storing other DNS record types at the registry.
+
+For all of the mentioned data is meant to be visible in DNS shifting from managing host objects to managing DNS data of a domain object will give an adavantage for adopting future resource record types as well covering current use cases.
+
 
 ## Domain Names in DNS
 
-DNS domain names are hierachically ordered label separated by a dot ".". Each label represent the delegation of a subordinate namespace or a host name. DNS resource records {{RFC1035}} are expressed as a dataset containing:
+DNS domain names are hierarchically ordered label separated by a dot ".". Each label represent the delegation of a subordinate namespace or a host name. DNS resource records {{RFC1035}} are expressed as a dataset containing:
 
 "NAME" "CLASS" "TYPE" "TTL" "RDLENGTH" "RDATA"
 
@@ -98,7 +110,7 @@ CLASS     The RR CLASS
 
 TYPE      The RR TYPE of data present in the RDATA field.
 
-TTL       Time interval a RR may be cached by nameservers
+TTL       Time interval a RR may be cached by name servers
 
 RDLENGTH  The length of the RDATA field. RDLENGTH will be safely ignored in RPP
 
@@ -164,7 +176,7 @@ Example:
           "rdata": {
             "address": "3.3.3.3"
           }
-        },
+        }
       ]
     }
 ~~~~
@@ -195,7 +207,7 @@ RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A c
 
 ##### "rdata"
 
-The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the coresponding RFC. Property names MUST be translated to lowercase. Whitespaces MUST be translated to underscores ("_").
+The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be translated to lowercase. Whitespaces MUST be translated to underscores ("_").
 
 Example:
 Section 3.3.11 NS RDATA format of {{RFC1035}} describes the RDATA of a NS RR as "NSDNAME".
@@ -226,8 +238,8 @@ The resulting structure is therefore:
 
 #### Additional controls
 
-In addition to the regular data a server MAY allow a client to control specific operational behaviour.
-A client MAY add an JSON object with a number of "controls" to the dns dataset.
+In addition to the regular data a server MAY allow a client to control specific operational behavior.
+A client MAY add an JSON object with a number of "controls" to the DNS dataset.
 
 ~~~~
     {
@@ -251,7 +263,7 @@ A client MAY add an JSON object with a number of "controls" to the dns dataset.
 
 To enable domain delegation a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}},{{RFC3596}}).
 
-A minimal delegation can be expressed by adding an array of nameservers to the dns data of a domain:
+A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:
 
 ~~~~
     {
@@ -381,7 +393,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-#### Maximum sinature lifetime
+#### Maximum signature lifetime
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
 
 A client MAY add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server MAY ignore this value, e.g. for policy reasons.
@@ -493,7 +505,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 
 ### Future DNS record types
 
-Future record types SHOULD be added by breaking down the RDATA field specified by the coresponding RFC of DNS record type.
+Future record types SHOULD be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.
 
 ## Signaling supported record types
 The server MUST provide a list of supported record types to the client.
@@ -513,10 +525,10 @@ Also see security considerations of {{RFC4627}}.
 
 This document has no IANA actions.
 
+# Appendix
+
 
 --- back
 
 # Acknowledgments
 {:numbered="false"}
-
-# Appendix
