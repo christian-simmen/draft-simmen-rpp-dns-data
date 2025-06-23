@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>DNS data mapping for use in RESTful Provisioning Protocol (RPP)</title>
+<title>DNS data representation for use in RESTful Provisioning Protocol (RPP)</title>
 <meta content="Christian Simmen" name="author">
 <meta content="
-       This document proposes an RESTful Provisioning Protocol (RPP) mapping for the provisioning of various DNS data. Specified in JSON, the mapping is decibes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types. 
+       This document proposes a representation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document describes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types. 
+       EPP focused on distinct host objects containing data used for delegation purposes   and a separate extension focused on transferring DNSSEC relevant data  . Current registry system implementations improve these by grouping name servers into a nsset, or allowing domain provisioning without delegation. In addition new delegation mechanisms are developed   to achieve a faster name resolution by providing properties of the child name server at delegation time. 
+       Regardless of the specific use case all of the above data is meant to become visible in DNS. For this a structure close to the targeted system (DNS) makes it easy to adopt to current and future developments. 
     " name="description">
 <meta content="xml2rfc 3.26.0" name="generator">
 <meta content="rpp" name="keyword">
@@ -1214,7 +1216,7 @@ li > p:last-of-type:only-child {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">DNS data mapping for use in RESTful Prov</td>
+<td class="center">RPP DNS</td>
 <td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
@@ -1247,10 +1249,12 @@ li > p:last-of-type:only-child {
 </dd>
 </dl>
 </div>
-<h1 id="title">DNS data mapping for use in RESTful Provisioning Protocol (RPP)</h1>
+<h1 id="title">DNS data representation for use in RESTful Provisioning Protocol (RPP)</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document proposes an RESTful Provisioning Protocol (RPP) mapping for the provisioning of various DNS data. Specified in JSON, the mapping is decibes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document proposes a representation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document describes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">EPP focused on distinct host objects containing data used for delegation purposes <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span> and a separate extension focused on transferring DNSSEC relevant data <span>[<a href="#RFC5910" class="cite xref">RFC5910</a>]</span>. Current registry system implementations improve these by grouping name servers into a nsset, or allowing domain provisioning without delegation. In addition new delegation mechanisms are developed <span>[<a href="#I-D.draft-ietf-deleg" class="cite xref">I-D.draft-ietf-deleg</a>]</span> to achieve a faster name resolution by providing properties of the child name server at delegation time.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">Regardless of the specific use case all of the above data is meant to become visible in DNS. For this a structure close to the targeted system (DNS) makes it easy to adopt to current and future developments.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1317,75 +1321,81 @@ li > p:last-of-type:only-child {
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-domain-names-in-dns" class="internal xref">Domain Names in DNS</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1.2.1">
-                    <p id="section-toc.1-1.1.2.1.2.1.1" class="keepWithNext"><a href="#section-1.1.1" class="auto internal xref">1.1.1</a>.  <a href="#name-name" class="internal xref">NAME</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1.2.2">
-                    <p id="section-toc.1-1.1.2.1.2.2.1" class="keepWithNext"><a href="#section-1.1.2" class="auto internal xref">1.1.2</a>.  <a href="#name-class" class="internal xref">CLASS</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1.2.3">
-                    <p id="section-toc.1-1.1.2.1.2.3.1" class="keepWithNext"><a href="#section-1.1.3" class="auto internal xref">1.1.3</a>.  <a href="#name-type" class="internal xref">TYPE</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1.2.4">
-                    <p id="section-toc.1-1.1.2.1.2.4.1"><a href="#section-1.1.4" class="auto internal xref">1.1.4</a>.  <a href="#name-ttl" class="internal xref">TTL</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1.2.5">
-                    <p id="section-toc.1-1.1.2.1.2.5.1"><a href="#section-1.1.5" class="auto internal xref">1.1.5</a>.  <a href="#name-rdata" class="internal xref">RDATA</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
-                <p id="section-toc.1-1.1.2.2.1"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-json-mapping" class="internal xref">JSON mapping</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.1">
-                    <p id="section-toc.1-1.1.2.2.2.1.1"><a href="#section-1.2.1" class="auto internal xref">1.2.1</a>.  <a href="#name-domain-delegation" class="internal xref">Domain delegation</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.2">
-                    <p id="section-toc.1-1.1.2.2.2.2.1"><a href="#section-1.2.2" class="auto internal xref">1.2.2</a>.  <a href="#name-dnssec" class="internal xref">DNSSEC</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.3">
-                    <p id="section-toc.1-1.1.2.2.2.3.1"><a href="#section-1.2.3" class="auto internal xref">1.2.3</a>.  <a href="#name-other-dns-data" class="internal xref">Other DNS data</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.4">
-                    <p id="section-toc.1-1.1.2.2.2.4.1"><a href="#section-1.2.4" class="auto internal xref">1.2.4</a>.  <a href="#name-future-dns-record-types" class="internal xref">Future DNS record types</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
-                <p id="section-toc.1-1.1.2.3.1"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-signaling-supported-record-" class="internal xref">Signaling supported record types</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-domain-names-in-dns" class="internal xref">Domain Names in DNS</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-json-representation" class="internal xref">JSON representation</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-rules" class="internal xref">Rules</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
+                    <p id="section-toc.1-1.3.2.1.2.1.1" class="keepWithNext"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-dns-data-extending-an-domai" class="internal xref">DNS data extending an domain object</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.2">
+                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-dns-record-structure-repres" class="internal xref">DNS record structure representation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.3">
+                    <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-additional-controls" class="internal xref">Additional controls</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.4">
+                    <p id="section-toc.1-1.3.2.1.2.4.1"><a href="#section-3.1.4" class="auto internal xref">3.1.4</a>.  <a href="#name-future-dns-record-types" class="internal xref">Future DNS record types</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-use-cases" class="internal xref">Use cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
+                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-domain-delegation" class="internal xref">Domain delegation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
+                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-dnssec" class="internal xref">DNSSEC</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
+                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-maximum-signature-lifetime" class="internal xref">Maximum signature lifetime</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.4">
+                    <p id="section-toc.1-1.3.2.2.2.4.1"><a href="#section-3.2.4" class="auto internal xref">3.2.4</a>.  <a href="#name-other-dns-data" class="internal xref">Other DNS data</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-signaling-supported-record-" class="internal xref">Signaling supported record types</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-appendix" class="internal xref">Appendix</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1396,72 +1406,228 @@ li > p:last-of-type:only-child {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">In EPP host objects <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span> are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS <span>[<a href="#RFC8484" class="cite xref">RFC8484</a>]</span> or DNS over QUIC <span>[<a href="#RFC9250" class="cite xref">RFC9250</a>]</span>. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type <span>[<a href="#I-D.draft-ietf-deleg" class="cite xref">I-D.draft-ietf-deleg</a>]</span> can be seen as an example.
-Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP <span>[<a href="#RFC5910" class="cite xref">RFC5910</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<div id="domain-names-in-dns">
-<section id="section-1.1">
-        <h3 id="name-domain-names-in-dns">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-domain-names-in-dns" class="section-name selfRef">Domain Names in DNS</a>
-        </h3>
-<p id="section-1.1-1">DNS domain names are hierachically ordered label separated by a dot ".". Each label may represent the delegation of a subordinate namespace or a host name. DNS resource records <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span> are expressed as a dataset containing:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<p id="section-1.1-2">"NAME" "CLASS" "TYPE" "TTL" "RDATA"<a href="#section-1.1-2" class="pilcrow">¶</a></p>
-<p id="section-1.1-3">A set of resource records describes the behavior of namespace.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
-<div id="name">
-<section id="section-1.1.1">
-          <h4 id="name-name">
-<a href="#section-1.1.1" class="section-number selfRef">1.1.1. </a><a href="#name-name" class="section-name selfRef">NAME</a>
-          </h4>
-<p id="section-1.1.1-1">A server <span class="bcp14">MUST NOT</span> accept a NAME which is not a subordinate label to the provisioned domain name or "@" representing the provisioned domain itself.<a href="#section-1.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">In EPP host objects <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span> are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS <span>[<a href="#RFC8484" class="cite xref">RFC8484</a>]</span> or DNS over QUIC <span>[<a href="#RFC9250" class="cite xref">RFC9250</a>]</span>. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type <span>[<a href="#I-D.draft-ietf-deleg" class="cite xref">I-D.draft-ietf-deleg</a>]</span> can be seen as an example.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP <span>[<a href="#RFC5910" class="cite xref">RFC5910</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Some current registry system implementations are further improving the
+management of dns data. For example FRED (CZ.NIC) is grouping name servers into name server sets. RRI (DENIC) provides an option to provision a delegation-less domain by storing other DNS record types at the registry.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">For all of the mentioned data is meant to be visible in DNS shifting from managing host objects to managing DNS data of a domain object will give an adavantage for adopting future resource record types as well covering current use cases.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="class">
-<section id="section-1.1.2">
-          <h4 id="name-class">
-<a href="#section-1.1.2" class="section-number selfRef">1.1.2. </a><a href="#name-class" class="section-name selfRef">CLASS</a>
+<div id="domain-names-in-dns">
+<section id="section-2">
+      <h2 id="name-domain-names-in-dns">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-domain-names-in-dns" class="section-name selfRef">Domain Names in DNS</a>
+      </h2>
+<p id="section-2-1">DNS domain names are hierarchically ordered label separated by a dot ".". Each label represent the delegation of a subordinate namespace or a host name. DNS resource records <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span> are expressed as a dataset containing:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">"NAME" "CLASS" "TYPE" "TTL" "RDLENGTH" "RDATA"<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">A set of resource records describes the behavior of a namespace. Each resource record shares the same top level format.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">NAME      The owner name of the DNS entry which <span class="bcp14">MAY</span> be the domain itself or a subordinate hostname.<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5">CLASS     The RR CLASS<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">TYPE      The RR TYPE of data present in the RDATA field.<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-7">TTL       Time interval a RR may be cached by name servers<a href="#section-2-7" class="pilcrow">¶</a></p>
+<p id="section-2-8">RDLENGTH  The length of the RDATA field. RDLENGTH will be safely ignored in RPP<a href="#section-2-8" class="pilcrow">¶</a></p>
+<p id="section-2-9">RDATA     The actual payload data. Structures defer for each type.<a href="#section-2-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="json-representation">
+<section id="section-3">
+      <h2 id="name-json-representation">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-json-representation" class="section-name selfRef">JSON representation</a>
+      </h2>
+<div id="rules">
+<section id="section-3.1">
+        <h3 id="name-rules">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-rules" class="section-name selfRef">Rules</a>
+        </h3>
+<div id="dns-data-extending-an-domain-object">
+<section id="section-3.1.1">
+          <h4 id="name-dns-data-extending-an-domai">
+<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-dns-data-extending-an-domai" class="section-name selfRef">DNS data extending an domain object</a>
           </h4>
-<p id="section-1.1.2-1">A client <span class="bcp14">SHOULD</span> omit the CLASS. The server <span class="bcp14">MUST</span> assume "IN" as CLASS of a transferred dataset an <span class="bcp14">MAY</span> decline other values.<a href="#section-1.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-1">Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an array of DNS entries. The properties of an object in this array <span class="bcp14">MUST</span> be a representation of the top level format as described in section 3.2.1 of <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>. All keys <span class="bcp14">MUST</span> be lowercase. Whitespaces <span class="bcp14">MUST</span> be translated to underscores ("_").<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1.1-2">
+<pre>
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "",
+          "class": "",
+          "type": "",
+          "ttl": "",
+          "rdata": {}
+        }
+      ]
+    }
+</pre><a href="#section-3.1.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="dns-record-structure-representation">
+<section id="section-3.1.2">
+          <h4 id="name-dns-record-structure-repres">
+<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-dns-record-structure-repres" class="section-name selfRef">DNS record structure representation</a>
+          </h4>
+<p id="section-3.1.2-1">#### name<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-2">The owner name of the DNS entry which <span class="bcp14">MAY</span> be the domain itself or a subordinate hostname. A server <span class="bcp14">MUST NOT</span> accept a NAME which is not a subordinate label to the provisioned domain name.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-3">A server <span class="bcp14">MUST</span> accept values as "@", "relative names" and fully qualified domain names (FQDN).<a href="#section-3.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-4">"@" <span class="bcp14">MUST</span> be interpreted as the provisioned domain name.<a href="#section-3.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-5">"relative names" <span class="bcp14">MUST</span> be appended by the server with the provisioned domain name.<a href="#section-3.1.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-6">"FQDN" identified by a trailing dot (".") <span class="bcp14">MUST NOT</span> be interpreted by the server. A server <span class="bcp14">MUST</span> check if the provided name is a subordinate to the provisioned domain, or the domain itself.<a href="#section-3.1.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-7">Example:
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "A",
+          "rdata": {
+            "address": "1.1.1.1"
+          }
+        },
+        {
+          "name": "www",
+          "type": "A",
+          "rdata": {
+            "address": "2.2.2.2"
+          }
+        },
+        {
+          "name": "web.example.com.",
+          "type": "A",
+          "rdata": {
+            "address": "3.3.3.3"
+          }
+        }
+      ]
+    }
+~~~~
+would imply three resulting records:
+An A RR for "example.com" ("@") set to 1.1.1.1.
+An A RR for "www.example.com" ("www" relative) set to 2.2.2.2.
+An A RR for "web.example.com" (FQDN) set to 3.3.3.3.<a href="#section-3.1.2-7" class="pilcrow">¶</a></p>
+<div id="class">
+<section id="section-3.1.2.1">
+            <h5 id="name-class">
+<a href="#section-3.1.2.1" class="section-number selfRef">3.1.2.1. </a><a href="#name-class" class="section-name selfRef">class</a>
+            </h5>
+<p id="section-3.1.2.1-1">A client <span class="bcp14">SHOULD</span> omit the class. The server <span class="bcp14">MUST</span> assume "IN" as class of a transferred dataset and <span class="bcp14">MAY</span> decline other values.
+If present the value <span class="bcp14">MUST</span> be chosen from section 3.2.4. CLASS values of <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>.<a href="#section-3.1.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="type">
-<section id="section-1.1.3">
-          <h4 id="name-type">
-<a href="#section-1.1.3" class="section-number selfRef">1.1.3. </a><a href="#name-type" class="section-name selfRef">TYPE</a>
-          </h4>
-<p id="section-1.1.3-1">The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.<a href="#section-1.1.3-1" class="pilcrow">¶</a></p>
+<section id="section-3.1.2.2">
+            <h5 id="name-type">
+<a href="#section-3.1.2.2" class="section-number selfRef">3.1.2.2. </a><a href="#name-type" class="section-name selfRef">type</a>
+            </h5>
+<p id="section-3.1.2.2-1">The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
+If present the value <span class="bcp14">MUST</span> chosen from section 3.2.2. TYPE values of <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span> or other RFC describing the RR TYPE.<a href="#section-3.1.2.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ttl">
-<section id="section-1.1.4">
-          <h4 id="name-ttl">
-<a href="#section-1.1.4" class="section-number selfRef">1.1.4. </a><a href="#name-ttl" class="section-name selfRef">TTL</a>
-          </h4>
-<p id="section-1.1.4-1">A server <span class="bcp14">MUST</span> set a default value as TTL and <span class="bcp14">MAY</span> decline other values. A client <span class="bcp14">MAY</span> omit this value.<a href="#section-1.1.4-1" class="pilcrow">¶</a></p>
+<section id="section-3.1.2.3">
+            <h5 id="name-ttl">
+<a href="#section-3.1.2.3" class="section-number selfRef">3.1.2.3. </a><a href="#name-ttl" class="section-name selfRef">ttl</a>
+            </h5>
+<p id="section-3.1.2.3-1">A server <span class="bcp14">MUST</span> set a default value as TTL and <span class="bcp14">MAY</span> decline other values. A client <span class="bcp14">SHOULD</span> omit this value.<a href="#section-3.1.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rdlength">
+<section id="section-3.1.2.4">
+            <h5 id="name-rdlength">
+<a href="#section-3.1.2.4" class="section-number selfRef">3.1.2.4. </a><a href="#name-rdlength" class="section-name selfRef">rdlength</a>
+            </h5>
+<p id="section-3.1.2.4-1">RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A client <span class="bcp14">MUST NOT</span> include this field. A server <span class="bcp14">MUST</span> ignore this field if present.<a href="#section-3.1.2.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rdata">
-<section id="section-1.1.5">
-          <h4 id="name-rdata">
-<a href="#section-1.1.5" class="section-number selfRef">1.1.5. </a><a href="#name-rdata" class="section-name selfRef">RDATA</a>
+<section id="section-3.1.2.5">
+            <h5 id="name-rdata">
+<a href="#section-3.1.2.5" class="section-number selfRef">3.1.2.5. </a><a href="#name-rdata" class="section-name selfRef">rdata</a>
+            </h5>
+<p id="section-3.1.2.5-1">The RDATA structure depends on the TYPE and <span class="bcp14">MUST</span> be expressed as a JSON object. Property names <span class="bcp14">MUST</span> follow the definition of the RDATA described by the corresponding RFC. Property names <span class="bcp14">MUST</span> be translated to lowercase. Whitespaces <span class="bcp14">MUST</span> be translated to underscores ("_").<a href="#section-3.1.2.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.2.5-2">Example:
+Section 3.3.11 NS RDATA format of <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span> describes the RDATA of a NS RR as "NSDNAME".
+Section 3.3.9 MX RDATA format of <span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span> describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
+The resulting structure is therefore:
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "a.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "MX",
+          "rdata": {
+            "preference": "10",
+            "exchange": "mx1.example.net"
+          }
+        }
+      ]
+    }
+~~~~<a href="#section-3.1.2.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="additional-controls">
+<section id="section-3.1.3">
+          <h4 id="name-additional-controls">
+<a href="#section-3.1.3" class="section-number selfRef">3.1.3. </a><a href="#name-additional-controls" class="section-name selfRef">Additional controls</a>
           </h4>
-<p id="section-1.1.5-1">The RDATA structure depends on the TYPE and <span class="bcp14">MUST</span> be expressed as a JSON object. Property names <span class="bcp14">MUST</span> follow the definition of the RDATA described by the coresponding RFC.<a href="#section-1.1.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.3-1">In addition to the regular data a server <span class="bcp14">MAY</span> allow a client to control specific operational behavior.
+A client <span class="bcp14">MAY</span> add an JSON object with a number of "controls" to the DNS dataset.<a href="#section-3.1.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1.3-2">
+<pre>
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "&lt;name&gt;",
+          "type": "&lt;type&gt;",
+          "rdata": {
+            "rdata_key": "&lt;rdata_value&gt;",
+          }
+          "controls": {
+            "&lt;named_control&gt;": "&lt;named_control_value&gt;"
+          }
+        }
+      ]
+    }
+</pre><a href="#section-3.1.3-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="future-dns-record-types">
+<section id="section-3.1.4">
+          <h4 id="name-future-dns-record-types">
+<a href="#section-3.1.4" class="section-number selfRef">3.1.4. </a><a href="#name-future-dns-record-types" class="section-name selfRef">Future DNS record types</a>
+          </h4>
+<p id="section-3.1.4-1">Future record types <span class="bcp14">SHOULD</span> be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.<a href="#section-3.1.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
-<div id="json-mapping">
-<section id="section-1.2">
-        <h3 id="name-json-mapping">
-<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-json-mapping" class="section-name selfRef">JSON mapping</a>
+<div id="use-cases">
+<section id="section-3.2">
+        <h3 id="name-use-cases">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-use-cases" class="section-name selfRef">Use cases</a>
         </h3>
 <div id="domain-delegation">
-<section id="section-1.2.1">
+<section id="section-3.2.1">
           <h4 id="name-domain-delegation">
-<a href="#section-1.2.1" class="section-number selfRef">1.2.1. </a><a href="#name-domain-delegation" class="section-name selfRef">Domain delegation</a>
+<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-domain-delegation" class="section-name selfRef">Domain delegation</a>
           </h4>
-<p id="section-1.2.1-1">To enable domain delegation a server <span class="bcp14">MUST</span> support the "NS", "A" and "AAAA" record types (<span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>,<span>[<a href="#RFC3596" class="cite xref">RFC3596</a>]</span>).<a href="#section-1.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-1.2.1-2">A minimal delegation can be expressed by adding an array of nameservers to the dns data of a domain:<a href="#section-1.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-1.2.1-3">TODO Discuss naming "nsdname" vs. "host" vs "nameserver"<a href="#section-1.2.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1.2.1-4">
+<p id="section-3.2.1-1">To enable domain delegation a server <span class="bcp14">MUST</span> support the "NS", "A" and "AAAA" record types (<span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>,<span>[<a href="#RFC3596" class="cite xref">RFC3596</a>]</span>).<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.1-2">A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.1-3">
 <pre>
     {
       "domain": "example.com",
@@ -1482,10 +1648,10 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
         }
       ]
     }
-</pre><a href="#section-1.2.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.1-3" class="pilcrow">¶</a>
 </div>
-<p id="section-1.2.1-5">If GLUE records are needed the client may add records of type "A" or "AAAA" :<a href="#section-1.2.1-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1.2.1-6">
+<p id="section-3.2.1-4">If GLUE records are needed the client may add records of type "A" or "AAAA" :<a href="#section-3.2.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.1-5">
 <pre>
     {
       "domain": "example.com",
@@ -1505,14 +1671,14 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
           }
         },
         {
-          "name": "ns.example.com",
+          "name": "ns.example.com.",
           "type": "A",
           "rdata": {
             "address": "1.2.3.4"
           }
         },
         {
-          "name": "ns.example.com",
+          "name": "ns.example.com.",
           "type": "AAAA",
           "rdata": {
             "address": "dead::beef"
@@ -1520,17 +1686,17 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
         }
       ]
     }
-</pre><a href="#section-1.2.1-6" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.1-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="dnssec">
-<section id="section-1.2.2">
+<section id="section-3.2.2">
           <h4 id="name-dnssec">
-<a href="#section-1.2.2" class="section-number selfRef">1.2.2. </a><a href="#name-dnssec" class="section-name selfRef">DNSSEC</a>
+<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-dnssec" class="section-name selfRef">DNSSEC</a>
           </h4>
-<p id="section-1.2.2-1">To enable DNSSEC provisioning a server <span class="bcp14">SHOULD</span> support either "DS" or "DNSKEY" or both record types. The records <span class="bcp14">MUST</span> be added to the "dns" array of the domain<a href="#section-1.2.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1.2.2-2">
+<p id="section-3.2.2-1">To enable DNSSEC provisioning a server <span class="bcp14">SHOULD</span> support either "DS" or "DNSKEY" or both record types. The records <span class="bcp14">MUST</span> be added to the "dns" array of the domain. If provided with only "DNSKEY" a server <span class="bcp14">MUST</span> calculate the DS record. If both record types are provided a server <span class="bcp14">MAY</span> use the DNSKEY to validate the DS record.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.2-2">
 <pre>
     {
       "domain": "example.com",
@@ -1561,12 +1727,12 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
         }
       ]
     }
-</pre><a href="#section-1.2.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.2-2" class="pilcrow">¶</a>
 </div>
-<div class="alignLeft art-text artwork" id="section-1.2.2-3">
+<div class="alignLeft art-text artwork" id="section-3.2.2-3">
 <pre>
     {
-      "domain": "example.com",
+      "domain": "example.com.",
       "dns": [
         {
           "name": "@",
@@ -1594,17 +1760,62 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
         }
       ]
     }
-</pre><a href="#section-1.2.2-3" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.2-3" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="maximum-signature-lifetime">
+<section id="section-3.2.3">
+          <h4 id="name-maximum-signature-lifetime">
+<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-maximum-signature-lifetime" class="section-name selfRef">Maximum signature lifetime</a>
+          </h4>
+<p id="section-3.2.3-1">Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of <span>[<a href="#RFC4034" class="cite xref">RFC4034</a>]</span> for information on the RRSIG resource record (RR).<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-2">A client <span class="bcp14">MAY</span> add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server <span class="bcp14">MAY</span> ignore this value, e.g. for policy reasons.<a href="#section-3.2.3-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.3-3">
+<pre>
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "a.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "b.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "DS",
+          "rdata": {
+            "key_tag": "370",
+            "algorithm": 13,
+            "digest_type": 2,
+            "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+          },
+          "controls": {
+            "maximum_signature_lifetime": 86400
+          }
+        }
+      ]
+    }
+</pre><a href="#section-3.2.3-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="other-dns-data">
-<section id="section-1.2.3">
+<section id="section-3.2.4">
           <h4 id="name-other-dns-data">
-<a href="#section-1.2.3" class="section-number selfRef">1.2.3. </a><a href="#name-other-dns-data" class="section-name selfRef">Other DNS data</a>
+<a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-other-dns-data" class="section-name selfRef">Other DNS data</a>
           </h4>
-<p id="section-1.2.3-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning.<a href="#section-1.2.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1.2.3-2">
+<p id="section-3.2.4-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2.4-2">
 <pre>
 {
   "domain": "example.com",
@@ -1617,7 +1828,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "www.example.com",
+      "name": "www.example.com.",
       "type": "A",
       "rdata": {
         "address": "1.2.3.4"
@@ -1631,7 +1842,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "www.example.com",
+      "name": "www.example.com.",
       "type": "A",
       "rdata": {
         "address": "dead::beef"
@@ -1646,7 +1857,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "mx1.example.com",
+      "name": "mx1.example.com.",
       "type": "A",
       "rdata": {
         "address": "5.6.7.8"
@@ -1669,69 +1880,66 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
     }
   ]
 }
-</pre><a href="#section-1.2.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.2.4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-1.2.3-3">TODO Discuss enforcement of FQDN in "name", "nsdname" and "exchange"<a href="#section-1.2.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="future-dns-record-types">
-<section id="section-1.2.4">
-          <h4 id="name-future-dns-record-types">
-<a href="#section-1.2.4" class="section-number selfRef">1.2.4. </a><a href="#name-future-dns-record-types" class="section-name selfRef">Future DNS record types</a>
-          </h4>
-<p id="section-1.2.4-1">Future record types may be added in the same way<a href="#section-1.2.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="signaling-supported-record-types">
-<section id="section-1.3">
-        <h3 id="name-signaling-supported-record-">
-<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-signaling-supported-record-" class="section-name selfRef">Signaling supported record types</a>
-        </h3>
-<p id="section-1.3-1">The server <span class="bcp14">MUST</span> provide a list of supported record types to the client.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
-<p id="section-1.3-2">TODO Add signaling to general signaling of server capabilities<a href="#section-1.3-2" class="pilcrow">¶</a></p>
-</section>
-</div>
+<section id="section-4">
+      <h2 id="name-signaling-supported-record-">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-signaling-supported-record-" class="section-name selfRef">Signaling supported record types</a>
+      </h2>
+<p id="section-4-1">The server <span class="bcp14">MUST</span> provide a list of supported record types to the client.<a href="#section-4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
-<section id="section-2">
+<section id="section-5">
       <h2 id="name-conventions-and-definitions">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
       </h2>
-<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+<p id="section-5-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
-appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+appear in all capitals, as shown here.<a href="#section-5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-3">
+<section id="section-6">
       <h2 id="name-security-considerations">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-3-1">A server <span class="bcp14">SHOULD</span> choose the supported record types wisely and <span class="bcp14">MAY</span> restrict the number of accepted entries.
-Also see security considerations of <span>[<a href="#RFC4627" class="cite xref">RFC4627</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">A server <span class="bcp14">SHOULD</span> choose the supported record types wisely and <span class="bcp14">MAY</span> restrict the number of accepted entries.
+Also see security considerations of <span>[<a href="#RFC4627" class="cite xref">RFC4627</a>]</span>.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-4">
+<section id="section-7">
       <h2 id="name-iana-considerations">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="appendix">
+<section id="section-8">
+      <h2 id="name-appendix">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-appendix" class="section-name selfRef">Appendix</a>
+    </h2>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-5">
+<section id="section-9">
       <h2 id="name-references">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-5.1">
+<section id="section-9.1">
         <h3 id="name-normative-references">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC1035">[RFC1035]</dt>
@@ -1762,9 +1970,9 @@ Also see security considerations of <span>[<a href="#RFC4627" class="cite xref">
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-5.2">
+<section id="section-9.2">
         <h3 id="name-informative-references">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="I-D.draft-bortzmeyer-dns-json-01">[I-D.draft-bortzmeyer-dns-json-01]</dt>

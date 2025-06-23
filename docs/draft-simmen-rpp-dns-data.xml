@@ -14,7 +14,7 @@
 
 <rfc ipr="trust200902" docName="draft-simmen-rpp-dns-data-00" category="info" submissionType="IETF" tocInclude="true" sortRefs="true" symRefs="true">
   <front>
-    <title>DNS data mapping for use in RESTful Provisioning Protocol (RPP)</title>
+    <title abbrev="RPP DNS">DNS data representation for use in RESTful Provisioning Protocol (RPP)</title>
 
     <author fullname="Christian Simmen">
       <organization>DENIC eG</organization>
@@ -34,7 +34,11 @@
 
 <?line 75?>
 
-<t>This document proposes an RESTful Provisioning Protocol (RPP) mapping for the provisioning of various DNS data. Specified in JSON, the mapping is decibes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.</t>
+<t>This document proposes a representation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document describes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.</t>
+
+<t>EPP focused on distinct host objects containing data used for delegation purposes <xref target="RFC5732"/> and a separate extension focused on transferring DNSSEC relevant data <xref target="RFC5910"/>. Current registry system implementations improve these by grouping name servers into a nsset, or allowing domain provisioning without delegation. In addition new delegation mechanisms are developed <xref target="I-D.draft-ietf-deleg"/> to achieve a faster name resolution by providing properties of the child name server at delegation time.</t>
+
+<t>Regardless of the specific use case all of the above data is meant to become visible in DNS. For this a structure close to the targeted system (DNS) makes it easy to adopt to current and future developments.</t>
 
 
 
@@ -61,56 +65,203 @@
   <middle>
 
 
-<?line 80?>
+<?line 85?>
 
 <section anchor="introduction"><name>Introduction</name>
 
-<t>In EPP host objects <xref target="RFC5732"/> are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS <xref target="RFC8484"/> or DNS over QUIC <xref target="RFC9250"/>. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type <xref target="I-D.draft-ietf-deleg"/> can be seen as an example.
-Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP <xref target="RFC5910"/>.</t>
+<t>In EPP host objects <xref target="RFC5732"/> are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS <xref target="RFC8484"/> or DNS over QUIC <xref target="RFC9250"/>. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type <xref target="I-D.draft-ietf-deleg"/> can be seen as an example.</t>
 
+<t>Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP <xref target="RFC5910"/>.</t>
+
+<t>Some current registry system implementations are further improving the
+management of dns data. For example FRED (CZ.NIC) is grouping name servers into name server sets. RRI (DENIC) provides an option to provision a delegation-less domain by storing other DNS record types at the registry.</t>
+
+<t>For all of the mentioned data is meant to be visible in DNS shifting from managing host objects to managing DNS data of a domain object will give an adavantage for adopting future resource record types as well covering current use cases.</t>
+
+</section>
 <section anchor="domain-names-in-dns"><name>Domain Names in DNS</name>
 
-<t>DNS domain names are hierachically ordered label separated by a dot ".". Each label may represent the delegation of a subordinate namespace or a host name. DNS resource records <xref target="RFC1035"/> are expressed as a dataset containing:</t>
+<t>DNS domain names are hierarchically ordered label separated by a dot ".". Each label represent the delegation of a subordinate namespace or a host name. DNS resource records <xref target="RFC1035"/> are expressed as a dataset containing:</t>
 
-<t>"NAME" "CLASS" "TYPE" "TTL" "RDATA"</t>
+<t>"NAME" "CLASS" "TYPE" "TTL" "RDLENGTH" "RDATA"</t>
 
-<t>A set of resource records describes the behavior of namespace.</t>
+<t>A set of resource records describes the behavior of a namespace. Each resource record shares the same top level format.</t>
 
-<section anchor="name"><name>NAME</name>
+<t>NAME      The owner name of the DNS entry which <bcp14>MAY</bcp14> be the domain itself or a subordinate hostname.</t>
 
-<t>A server <bcp14>MUST NOT</bcp14> accept a NAME which is not a subordinate label to the provisioned domain name or "@" representing the provisioned domain itself.</t>
+<t>CLASS     The RR CLASS</t>
 
-</section>
-<section anchor="class"><name>CLASS</name>
+<t>TYPE      The RR TYPE of data present in the RDATA field.</t>
 
-<t>A client <bcp14>SHOULD</bcp14> omit the CLASS. The server <bcp14>MUST</bcp14> assume "IN" as CLASS of a transferred dataset an <bcp14>MAY</bcp14> decline other values.</t>
+<t>TTL       Time interval a RR may be cached by name servers</t>
 
-</section>
-<section anchor="type"><name>TYPE</name>
+<t>RDLENGTH  The length of the RDATA field. RDLENGTH will be safely ignored in RPP</t>
 
-<t>The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.</t>
+<t>RDATA     The actual payload data. Structures defer for each type.</t>
 
 </section>
-<section anchor="ttl"><name>TTL</name>
+<section anchor="json-representation"><name>JSON representation</name>
 
-<t>A server <bcp14>MUST</bcp14> set a default value as TTL and <bcp14>MAY</bcp14> decline other values. A client <bcp14>MAY</bcp14> omit this value.</t>
+<section anchor="rules"><name>Rules</name>
+
+<section anchor="dns-data-extending-an-domain-object"><name>DNS data extending an domain object</name>
+<t>Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an array of DNS entries. The properties of an object in this array <bcp14>MUST</bcp14> be a representation of the top level format as described in section 3.2.1 of <xref target="RFC1035"/>. All keys <bcp14>MUST</bcp14> be lowercase. Whitespaces <bcp14>MUST</bcp14> be translated to underscores ("_").</t>
+
+<figure><artwork><![CDATA[
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "",
+          "class": "",
+          "type": "",
+          "ttl": "",
+          "rdata": {}
+        }
+      ]
+    }
+]]></artwork></figure>
 
 </section>
-<section anchor="rdata"><name>RDATA</name>
+<section anchor="dns-record-structure-representation"><name>DNS record structure representation</name>
+<t>#### name</t>
 
-<t>The RDATA structure depends on the TYPE and <bcp14>MUST</bcp14> be expressed as a JSON object. Property names <bcp14>MUST</bcp14> follow the definition of the RDATA described by the coresponding RFC.</t>
+<t>The owner name of the DNS entry which <bcp14>MAY</bcp14> be the domain itself or a subordinate hostname. A server <bcp14>MUST NOT</bcp14> accept a NAME which is not a subordinate label to the provisioned domain name.</t>
+
+<t>A server <bcp14>MUST</bcp14> accept values as "@", "relative names" and fully qualified domain names (FQDN).</t>
+
+<t>"@" <bcp14>MUST</bcp14> be interpreted as the provisioned domain name.</t>
+
+<t>"relative names" <bcp14>MUST</bcp14> be appended by the server with the provisioned domain name.</t>
+
+<t>"FQDN" identified by a trailing dot (".") <bcp14>MUST NOT</bcp14> be interpreted by the server. A server <bcp14>MUST</bcp14> check if the provided name is a subordinate to the provisioned domain, or the domain itself.</t>
+
+<t>Example:
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "A",
+          "rdata": {
+            "address": "1.1.1.1"
+          }
+        },
+        {
+          "name": "www",
+          "type": "A",
+          "rdata": {
+            "address": "2.2.2.2"
+          }
+        },
+        {
+          "name": "web.example.com.",
+          "type": "A",
+          "rdata": {
+            "address": "3.3.3.3"
+          }
+        }
+      ]
+    }
+~~~~
+would imply three resulting records:
+An A RR for "example.com" ("@") set to 1.1.1.1.
+An A RR for "www.example.com" ("www" relative) set to 2.2.2.2.
+An A RR for "web.example.com" (FQDN) set to 3.3.3.3.</t>
+
+<section anchor="class"><name>class</name>
+
+<t>A client <bcp14>SHOULD</bcp14> omit the class. The server <bcp14>MUST</bcp14> assume "IN" as class of a transferred dataset and <bcp14>MAY</bcp14> decline other values.
+If present the value <bcp14>MUST</bcp14> be chosen from section 3.2.4. CLASS values of <xref target="RFC1035"/>.</t>
+
+</section>
+<section anchor="type"><name>type</name>
+
+<t>The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
+If present the value <bcp14>MUST</bcp14> chosen from section 3.2.2. TYPE values of <xref target="RFC1035"/> or other RFC describing the RR TYPE.</t>
+
+</section>
+<section anchor="ttl"><name>ttl</name>
+
+<t>A server <bcp14>MUST</bcp14> set a default value as TTL and <bcp14>MAY</bcp14> decline other values. A client <bcp14>SHOULD</bcp14> omit this value.</t>
+
+</section>
+<section anchor="rdlength"><name>rdlength</name>
+
+<t>RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A client <bcp14>MUST NOT</bcp14> include this field. A server <bcp14>MUST</bcp14> ignore this field if present.</t>
+
+</section>
+<section anchor="rdata"><name>rdata</name>
+
+<t>The RDATA structure depends on the TYPE and <bcp14>MUST</bcp14> be expressed as a JSON object. Property names <bcp14>MUST</bcp14> follow the definition of the RDATA described by the corresponding RFC. Property names <bcp14>MUST</bcp14> be translated to lowercase. Whitespaces <bcp14>MUST</bcp14> be translated to underscores ("_").</t>
+
+<t>Example:
+Section 3.3.11 NS RDATA format of <xref target="RFC1035"/> describes the RDATA of a NS RR as "NSDNAME".
+Section 3.3.9 MX RDATA format of <xref target="RFC1035"/> describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
+The resulting structure is therefore:
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "a.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "MX",
+          "rdata": {
+            "preference": "10",
+            "exchange": "mx1.example.net"
+          }
+        }
+      ]
+    }
+~~~~</t>
 
 </section>
 </section>
-<section anchor="json-mapping"><name>JSON mapping</name>
+<section anchor="additional-controls"><name>Additional controls</name>
+
+<t>In addition to the regular data a server <bcp14>MAY</bcp14> allow a client to control specific operational behavior.
+A client <bcp14>MAY</bcp14> add an JSON object with a number of "controls" to the DNS dataset.</t>
+
+<figure><artwork><![CDATA[
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "<name>",
+          "type": "<type>",
+          "rdata": {
+            "rdata_key": "<rdata_value>",
+          }
+          "controls": {
+            "<named_control>": "<named_control_value>"
+          }
+        }
+      ]
+    }
+]]></artwork></figure>
+
+</section>
+<section anchor="future-dns-record-types"><name>Future DNS record types</name>
+
+<t>Future record types <bcp14>SHOULD</bcp14> be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.</t>
+
+</section>
+</section>
+<section anchor="use-cases"><name>Use cases</name>
 
 <section anchor="domain-delegation"><name>Domain delegation</name>
 
 <t>To enable domain delegation a server <bcp14>MUST</bcp14> support the "NS", "A" and "AAAA" record types (<xref target="RFC1035"/>,<xref target="RFC3596"/>).</t>
 
-<t>A minimal delegation can be expressed by adding an array of nameservers to the dns data of a domain:</t>
-
-<t>TODO Discuss naming "nsdname" vs. "host" vs "nameserver"</t>
+<t>A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:</t>
 
 <figure><artwork><![CDATA[
     {
@@ -155,14 +306,14 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
           }
         },
         {
-          "name": "ns.example.com",
+          "name": "ns.example.com.",
           "type": "A",
           "rdata": {
             "address": "1.2.3.4"
           }
         },
         {
-          "name": "ns.example.com",
+          "name": "ns.example.com.",
           "type": "AAAA",
           "rdata": {
             "address": "dead::beef"
@@ -175,7 +326,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
 </section>
 <section anchor="dnssec"><name>DNSSEC</name>
 
-<t>To enable DNSSEC provisioning a server <bcp14>SHOULD</bcp14> support either "DS" or "DNSKEY" or both record types. The records <bcp14>MUST</bcp14> be added to the "dns" array of the domain</t>
+<t>To enable DNSSEC provisioning a server <bcp14>SHOULD</bcp14> support either "DS" or "DNSKEY" or both record types. The records <bcp14>MUST</bcp14> be added to the "dns" array of the domain. If provided with only "DNSKEY" a server <bcp14>MUST</bcp14> calculate the DS record. If both record types are provided a server <bcp14>MAY</bcp14> use the DNSKEY to validate the DS record.</t>
 
 <figure><artwork><![CDATA[
     {
@@ -211,7 +362,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
 
 <figure><artwork><![CDATA[
     {
-      "domain": "example.com",
+      "domain": "example.com.",
       "dns": [
         {
           "name": "@",
@@ -242,6 +393,47 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
 ]]></artwork></figure>
 
 </section>
+<section anchor="maximum-signature-lifetime"><name>Maximum signature lifetime</name>
+<t>Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of <xref target="RFC4034"/> for information on the RRSIG resource record (RR).</t>
+
+<t>A client <bcp14>MAY</bcp14> add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server <bcp14>MAY</bcp14> ignore this value, e.g. for policy reasons.</t>
+
+<figure><artwork><![CDATA[
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "a.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "b.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "DS",
+          "rdata": {
+            "key_tag": "370",
+            "algorithm": 13,
+            "digest_type": 2,
+            "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+          },
+          "controls": {
+            "maximum_signature_lifetime": 86400
+          }
+        }
+      ]
+    }
+]]></artwork></figure>
+
+</section>
 <section anchor="other-dns-data"><name>Other DNS data</name>
 
 <t>A server <bcp14>MAY</bcp14> support additional RR types, e.g. to support delegation-less provisioning.</t>
@@ -258,7 +450,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "www.example.com",
+      "name": "www.example.com.",
       "type": "A",
       "rdata": {
         "address": "1.2.3.4"
@@ -272,7 +464,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "www.example.com",
+      "name": "www.example.com.",
       "type": "A",
       "rdata": {
         "address": "dead::beef"
@@ -287,7 +479,7 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
       }
     },
     {
-      "name": "mx1.example.com",
+      "name": "mx1.example.com.",
       "type": "A",
       "rdata": {
         "address": "5.6.7.8"
@@ -312,21 +504,12 @@ Apart from plain delegation information other DNS related data like DNSSEC infor
 }
 ]]></artwork></figure>
 
-<t>TODO Discuss enforcement of FQDN in "name", "nsdname" and "exchange"</t>
-
 </section>
-<section anchor="future-dns-record-types"><name>Future DNS record types</name>
-
-<t>Future record types may be added in the same way</t>
-
 </section>
 </section>
 <section anchor="signaling-supported-record-types"><name>Signaling supported record types</name>
 <t>The server <bcp14>MUST</bcp14> provide a list of supported record types to the client.</t>
 
-<t>TODO Add signaling to general signaling of server capabilities</t>
-
-</section>
 </section>
 <section anchor="conventions-and-definitions"><name>Conventions and Definitions</name>
 
@@ -348,6 +531,9 @@ Also see security considerations of <xref target="RFC4627"/>.</t>
 <section anchor="iana-considerations"><name>IANA Considerations</name>
 
 <t>This document has no IANA actions.</t>
+
+</section>
+<section anchor="appendix"><name>Appendix</name>
 
 </section>
 
@@ -599,7 +785,7 @@ Also see security considerations of <xref target="RFC4627"/>.</t>
 </references>
 
 
-<?line 371?>
+<?line 550?>
 
 <section numbered="false" anchor="acknowledgments"><name>Acknowledgments</name>
 
@@ -609,79 +795,115 @@ Also see security considerations of <xref target="RFC4627"/>.</t>
   </back>
 
 <!-- ##markdown-source:
-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
-AAA=
+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
+z+G+NAzTKvjB5R9iurfO/wDvxfhGHj4AAA==
 
 -->
 

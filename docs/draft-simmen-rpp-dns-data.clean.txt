@@ -8,16 +8,30 @@ Intended status: Informational                              17 June 2025
 Expires: 19 December 2025
 
 
-    DNS data mapping for use in RESTful Provisioning Protocol (RPP)
+ DNS data representation for use in RESTful Provisioning Protocol (RPP)
                       draft-simmen-rpp-dns-data-00
 
 Abstract
 
-   This document proposes an RESTful Provisioning Protocol (RPP) mapping
-   for the provisioning of various DNS data.  Specified in JSON, the
-   mapping is decibes common DNS record types used for domain
+   This document proposes a representation for various DNS data for use
+   in the RESTful Provisioning Protocol (RPP).  Specified in JSON, the
+   document describes common DNS record types used for domain
    provisioning as well as giving advice on how to adopt future record
    types.
+
+   EPP focused on distinct host objects containing data used for
+   delegation purposes [RFC5732] and a separate extension focused on
+   transferring DNSSEC relevant data [RFC5910].  Current registry system
+   implementations improve these by grouping name servers into a nsset,
+   or allowing domain provisioning without delegation.  In addition new
+   delegation mechanisms are developed [I-D.draft-ietf-deleg] to achieve
+   a faster name resolution by providing properties of the child name
+   server at delegation time.
+
+   Regardless of the specific use case all of the above data is meant to
+   become visible in DNS.  For this a structure close to the targeted
+   system (DNS) makes it easy to adopt to current and future
+   developments.
 
 About This Document
 
@@ -70,24 +84,26 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
-     1.1.  Domain Names in DNS
-       1.1.1.  NAME
-       1.1.2.  CLASS
-       1.1.3.  TYPE
-       1.1.4.  TTL
-       1.1.5.  RDATA
-     1.2.  JSON mapping
-       1.2.1.  Domain delegation
-       1.2.2.  DNSSEC
-       1.2.3.  Other DNS data
-       1.2.4.  Future DNS record types
-     1.3.  Signaling supported record types
-   2.  Conventions and Definitions
-   3.  Security Considerations
-   4.  IANA Considerations
-   5.  References
-     5.1.  Normative References
-     5.2.  Informative References
+   2.  Domain Names in DNS
+   3.  JSON representation
+     3.1.  Rules
+       3.1.1.  DNS data extending an domain object
+       3.1.2.  DNS record structure representation
+       3.1.3.  Additional controls
+       3.1.4.  Future DNS record types
+     3.2.  Use cases
+       3.2.1.  Domain delegation
+       3.2.2.  DNSSEC
+       3.2.3.  Maximum signature lifetime
+       3.2.4.  Other DNS data
+   4.  Signaling supported record types
+   5.  Conventions and Definitions
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  Appendix
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -100,59 +116,182 @@ Table of Contents
    [RFC8484] or DNS over QUIC [RFC9250].  Along with this development
    the need for more fine grained delegation information is emerging.
    The DELEG record type [I-D.draft-ietf-deleg] can be seen as an
-   example.  Apart from plain delegation information other DNS related
-   data like DNSSEC information is common to be provisioned through EPP
-   [RFC5910].
+   example.
 
-1.1.  Domain Names in DNS
+   Apart from plain delegation information other DNS related data like
+   DNSSEC information is common to be provisioned through EPP [RFC5910].
 
-   DNS domain names are hierachically ordered label separated by a dot
-   ".".  Each label may represent the delegation of a subordinate
-   namespace or a host name.  DNS resource records [RFC1035] are
-   expressed as a dataset containing:
+   Some current registry system implementations are further improving
+   the management of dns data.  For example FRED (CZ.NIC) is grouping
+   name servers into name server sets.  RRI (DENIC) provides an option
+   to provision a delegation-less domain by storing other DNS record
+   types at the registry.
 
-   "NAME" "CLASS" "TYPE" "TTL" "RDATA"
+   For all of the mentioned data is meant to be visible in DNS shifting
+   from managing host objects to managing DNS data of a domain object
+   will give an adavantage for adopting future resource record types as
+   well covering current use cases.
 
-   A set of resource records describes the behavior of namespace.
+2.  Domain Names in DNS
 
-1.1.1.  NAME
+   DNS domain names are hierarchically ordered label separated by a dot
+   ".".  Each label represent the delegation of a subordinate namespace
+   or a host name.  DNS resource records [RFC1035] are expressed as a
+   dataset containing:
 
-   A server MUST NOT accept a NAME which is not a subordinate label to
-   the provisioned domain name or "@" representing the provisioned
-   domain itself.
+   "NAME" "CLASS" "TYPE" "TTL" "RDLENGTH" "RDATA"
 
-1.1.2.  CLASS
+   A set of resource records describes the behavior of a namespace.
+   Each resource record shares the same top level format.
 
-   A client SHOULD omit the CLASS.  The server MUST assume "IN" as CLASS
-   of a transferred dataset an MAY decline other values.
+   NAME The owner name of the DNS entry which MAY be the domain itself
+   or a subordinate hostname.
 
-1.1.3.  TYPE
+   CLASS The RR CLASS
+
+   TYPE The RR TYPE of data present in the RDATA field.
+
+   TTL Time interval a RR may be cached by name servers
+
+   RDLENGTH The length of the RDATA field.  RDLENGTH will be safely
+   ignored in RPP
+
+   RDATA The actual payload data.  Structures defer for each type.
+
+3.  JSON representation
+
+3.1.  Rules
+
+3.1.1.  DNS data extending an domain object
+
+   Delegation data, as well as DNSSEC data, is intended to find it's way
+   into the parent side DNS servers.  Because of the strong connection
+   to the provisioned domain object and DNS servers both aspects should
+   be visible in the RPP data model.  Therefore the domain object is
+   extended by an array of DNS entries.  The properties of an object in
+   this array MUST be a representation of the top level format as
+   described in section 3.2.1 of [RFC1035].  All keys MUST be lowercase.
+   Whitespaces MUST be translated to underscores ("_").
+
+       {
+         "domain": "example.com",
+         "dns": [
+           {
+             "name": "",
+             "class": "",
+             "type": "",
+             "ttl": "",
+             "rdata": {}
+           }
+         ]
+       }
+
+3.1.2.  DNS record structure representation
+
+   #### name
+
+   The owner name of the DNS entry which MAY be the domain itself or a
+   subordinate hostname.  A server MUST NOT accept a NAME which is not a
+   subordinate label to the provisioned domain name.
+
+   A server MUST accept values as "@", "relative names" and fully
+   qualified domain names (FQDN).
+
+   "@" MUST be interpreted as the provisioned domain name.
+
+   "relative names" MUST be appended by the server with the provisioned
+   domain name.
+
+   "FQDN" identified by a trailing dot (".") MUST NOT be interpreted by
+   the server.  A server MUST check if the provided name is a
+   subordinate to the provisioned domain, or the domain itself.
+
+   Example: ~~~~ { "domain": "example.com", "dns": [ { "name": "@",
+   "type": "A", "rdata": { "address": "1.1.1.1" } }, { "name": "www",
+   "type": "A", "rdata": { "address": "2.2.2.2" } }, { "name":
+   "web.example.com.", "type": "A", "rdata": { "address": "3.3.3.3" } }
+   ] } ~~~~ would imply three resulting records: An A RR for
+   "example.com" ("@") set to 1.1.1.1.  An A RR for "www.example.com"
+   ("www" relative) set to 2.2.2.2.  An A RR for "web.example.com"
+   (FQDN) set to 3.3.3.3.
+
+3.1.2.1.  class
+
+   A client SHOULD omit the class.  The server MUST assume "IN" as class
+   of a transferred dataset and MAY decline other values.  If present
+   the value MUST be chosen from section 3.2.4.  CLASS values of
+   [RFC1035].
+
+3.1.2.2.  type
 
    The TYPE of data present in the RDATA.  This also implies the
-   expected fields in RDATA.
+   expected fields in RDATA.  If present the value MUST chosen from
+   section 3.2.2.  TYPE values of [RFC1035] or other RFC describing the
+   RR TYPE.
 
-1.1.4.  TTL
+3.1.2.3.  ttl
 
    A server MUST set a default value as TTL and MAY decline other
-   values.  A client MAY omit this value.
+   values.  A client SHOULD omit this value.
 
-1.1.5.  RDATA
+3.1.2.4.  rdlength
+
+   RDLENGTH specifies the length of the RDATA field and will be ignored
+   in RPP.  A client MUST NOT include this field.  A server MUST ignore
+   this field if present.
+
+3.1.2.5.  rdata
 
    The RDATA structure depends on the TYPE and MUST be expressed as a
    JSON object.  Property names MUST follow the definition of the RDATA
-   described by the coresponding RFC.
+   described by the corresponding RFC.  Property names MUST be
+   translated to lowercase.  Whitespaces MUST be translated to
+   underscores ("_").
 
-1.2.  JSON mapping
+   Example: Section 3.3.11 NS RDATA format of [RFC1035] describes the
+   RDATA of a NS RR as "NSDNAME".  Section 3.3.9 MX RDATA format of
+   [RFC1035] describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
+   The resulting structure is therefore: ~~~~ { "domain": "example.com",
+   "dns": [ { "name": "@", "type": "NS", "rdata": { "nsdname": "a.iana-
+   servers.net." } }, { "name": "@", "type": "MX", "rdata": {
+   "preference": "10", "exchange": "mx1.example.net" } } ] } ~~~~
 
-1.2.1.  Domain delegation
+3.1.3.  Additional controls
+
+   In addition to the regular data a server MAY allow a client to
+   control specific operational behavior.  A client MAY add an JSON
+   object with a number of "controls" to the DNS dataset.
+
+       {
+         "domain": "example.com",
+         "dns": [
+           {
+             "name": "<name>",
+             "type": "<type>",
+             "rdata": {
+               "rdata_key": "<rdata_value>",
+             }
+             "controls": {
+               "<named_control>": "<named_control_value>"
+             }
+           }
+         ]
+       }
+
+3.1.4.  Future DNS record types
+
+   Future record types SHOULD be added by breaking down the RDATA field
+   specified by the RFC of the corresponding DNS record type.
+
+3.2.  Use cases
+
+3.2.1.  Domain delegation
 
    To enable domain delegation a server MUST support the "NS", "A" and
    "AAAA" record types ([RFC1035],[RFC3596]).
 
-   A minimal delegation can be expressed by adding an array of
-   nameservers to the dns data of a domain:
-
-   TODO Discuss naming "nsdname" vs. "host" vs "nameserver"
+   A minimal delegation can be expressed by adding an array of name
+   servers to the DNS data of a domain:
 
        {
          "domain": "example.com",
@@ -195,14 +334,14 @@ Table of Contents
              }
            },
            {
-             "name": "ns.example.com",
+             "name": "ns.example.com.",
              "type": "A",
              "rdata": {
                "address": "1.2.3.4"
              }
            },
            {
-             "name": "ns.example.com",
+             "name": "ns.example.com.",
              "type": "AAAA",
              "rdata": {
                "address": "dead::beef"
@@ -211,11 +350,13 @@ Table of Contents
          ]
        }
 
-1.2.2.  DNSSEC
+3.2.2.  DNSSEC
 
    To enable DNSSEC provisioning a server SHOULD support either "DS" or
    "DNSKEY" or both record types.  The records MUST be added to the
-   "dns" array of the domain
+   "dns" array of the domain.  If provided with only "DNSKEY" a server
+   MUST calculate the DS record.  If both record types are provided a
+   server MAY use the DNSKEY to validate the DS record.
 
     {
       "domain": "example.com",
@@ -248,7 +389,7 @@ Table of Contents
     }
 
     {
-      "domain": "example.com",
+      "domain": "example.com.",
       "dns": [
         {
           "name": "@",
@@ -277,7 +418,53 @@ Table of Contents
       ]
     }
 
-1.2.3.  Other DNS data
+3.2.3.  Maximum signature lifetime
+
+   Maximum signature lifetime (maximum_signature_lifetime) describes the
+   maximum number of seconds after signature generation a parents
+   signature on signed DNS information should expire.  The
+   maximum_signature_lifetime value applies to the RRSIG resource record
+   (RR) over the signed DNS RR.  See Section 3 of [RFC4034] for
+   information on the RRSIG resource record (RR).
+
+   A client MAY add maximum_signature_lifetime to the controls of an
+   entry which is intended to be signed on the parent side.  A server
+   MAY ignore this value, e.g. for policy reasons.
+
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "a.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "NS",
+          "rdata": {
+            "nsdname": "b.iana-servers.net."
+          }
+        },
+        {
+          "name": "@",
+          "type": "DS",
+          "rdata": {
+            "key_tag": "370",
+            "algorithm": 13,
+            "digest_type": 2,
+            "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+          },
+          "controls": {
+            "maximum_signature_lifetime": 86400
+          }
+        }
+      ]
+    }
+
+3.2.4.  Other DNS data
 
    A server MAY support additional RR types, e.g. to support delegation-
    less provisioning.
@@ -293,7 +480,7 @@ Table of Contents
          }
        },
        {
-         "name": "www.example.com",
+         "name": "www.example.com.",
          "type": "A",
          "rdata": {
            "address": "1.2.3.4"
@@ -307,7 +494,7 @@ Table of Contents
          }
        },
        {
-         "name": "www.example.com",
+         "name": "www.example.com.",
          "type": "A",
          "rdata": {
            "address": "dead::beef"
@@ -322,7 +509,7 @@ Table of Contents
          }
        },
        {
-         "name": "mx1.example.com",
+         "name": "mx1.example.com.",
          "type": "A",
          "rdata": {
            "address": "5.6.7.8"
@@ -346,20 +533,12 @@ Table of Contents
      ]
    }
 
-   TODO Discuss enforcement of FQDN in "name", "nsdname" and "exchange"
-
-1.2.4.  Future DNS record types
-
-   Future record types may be added in the same way
-
-1.3.  Signaling supported record types
+4.  Signaling supported record types
 
    The server MUST provide a list of supported record types to the
    client.
 
-   TODO Add signaling to general signaling of server capabilities
-
-2.  Conventions and Definitions
+5.  Conventions and Definitions
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -367,19 +546,21 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Security Considerations
+6.  Security Considerations
 
    A server SHOULD choose the supported record types wisely and MAY
    restrict the number of accepted entries.  Also see security
    considerations of [RFC4627].
 
-4.  IANA Considerations
+7.  IANA Considerations
 
    This document has no IANA actions.
 
-5.  References
+8.  Appendix
 
-5.1.  Normative References
+9.  References
+
+9.1.  Normative References
 
    [RFC1035]  Mockapetris, P., "Domain names - implementation and
               specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
@@ -407,7 +588,7 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-5.2.  Informative References
+9.2.  Informative References
 
    [I-D.draft-bortzmeyer-dns-json-01]
               Bortzmeyer, S., "JSON format to represent DNS data", Work
