@@ -26,7 +26,7 @@ category: info
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-06-17
+date: 2025-06-24
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -62,7 +62,7 @@ normative:
 # * RPP Requirements
 
 informative:
-# * RDAP DNS?
+# RDAP DNS?
   RFC3596:
   RFC4034:
   RFC8484:
@@ -70,6 +70,8 @@ informative:
   RFC9250:
   I-D.draft-ietf-deleg:
   I-D.draft-bortzmeyer-dns-json-01:
+  # FRED?
+  # RRI?
 ...
 
 --- abstract
@@ -356,7 +358,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "name": "@",
           "type": "DS",
           "rdata": {
-            "key_tag": "370",
+            "key_tag": 370,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
@@ -425,7 +427,7 @@ A client MAY add maximum_signature_lifetime to the controls of an entry which is
           "name": "@",
           "type": "DS",
           "rdata": {
-            "key_tag": "370",
+            "key_tag": "370,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
