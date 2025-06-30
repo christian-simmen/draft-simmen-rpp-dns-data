@@ -74,27 +74,19 @@ informative:
 
 --- abstract
 
-This document proposes a representation for various DNS data for use in the RESTful Provisioning Protocol (RPP). Specified in JSON, the document describes common DNS record types used for domain provisioning as well as giving advice on how to adopt future record types.
-
-EPP focused on distinct host objects containing data used for delegation purposes {{RFC5732}} and a separate extension focused on transferring DNSSEC relevant data {{RFC5910}}. Current registry system implementations improve these by grouping name servers into a nsset, or allowing domain provisioning without delegation. In addition new delegation mechanisms are developed {{I-D.draft-ietf-deleg}} to achieve a faster name resolution by providing properties of the child name server at delegation time.
-
-Regardless of the specific use case all of the above data is meant to become visible in DNS. For this a structure close to the targeted system (DNS) makes it easy to adopt to current and future developments.
-
-
+This document proposes a unified, extensible JSON representation for DNS resource records for use in the RESTful Provisioning Protocol (RPP). The aim is to create a single, consistent structure for provisioning all DNS-related data—including delegation, DNSSEC, and other record types—that directly mirrors the DNS data model and being mappable to existing EPP model of requests and responses same time. This approach simplifies the adoption of both current and future DNS features by aligning the provisioning format with the target system, thereby streamlining the management of domain names and related objects within RPP.
 
 --- middle
 
 # Introduction
 
-In EPP host objects {{RFC5732}} are introduced. In the context of domain name service provisioning those objects are used as delegation information (NS) with optional GLUE (A) records. By the time of writing new transport protocols are used for DNS like DNS over HTTPS {{RFC8484}} or DNS over QUIC {{RFC9250}}. Along with this development the need for more fine grained delegation information is emerging. The DELEG record type {{I-D.draft-ietf-deleg}} can be seen as an example.
+The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects {{RFC5732}} are used for nameservers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension {{RFC5910}}. Nameserver information can be also directly attached to a domain name as a set of Host Attributes {{RFC5731}}. More recently, control over Time-to-Live (TTL) values was added through another extension {{RFC9803}}.
 
-Apart from plain delegation information other DNS related data like DNSSEC information is common to be provisioned through EPP {{RFC5910}}.
+While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS {{RFC8484}} and DNS-over-QUIC {{RFC9250}} driving the need for more sophisticated delegation information, such as the proposed DELEG record type {{I-D.draft-ietf-deleg}}.
 
-Some current registry system implementations are further improving the
-management of dns data. For example FRED (CZ.NIC) is grouping name servers into name server sets. RRI (DENIC) provides an option to provision a delegation-less domain by storing other DNS record types at the registry.
+Some registry operators have developed their own proprietary solutions. These include grouping nameservers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.
 
-For all of the mentioned data is meant to be visible in DNS shifting from managing host objects to managing DNS data of a domain object will give an adavantage for adopting future resource record types as well covering current use cases.
-
+The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like nameserver sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.
 
 # Domain Names in DNS
 
