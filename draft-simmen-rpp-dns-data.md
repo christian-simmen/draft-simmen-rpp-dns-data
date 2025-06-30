@@ -26,7 +26,7 @@ category: info
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-06-24
+date: 2025-06-30
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -53,25 +53,21 @@ author:
     email: simmen@denic.de
 
 normative:
+  I.D.draft-wullink-rpp-requirements:
+  I.D.draft-kowalik-rpp-architecture:
   RFC1035:
   RFC4627:
-  RFC5730:
   RFC5732:
-
-# * RRP Architectural
-# * RPP Requirements
-
-informative:
-# RDAP DNS?
+  RFC5910:
+  RFC5731:
+  RFC9803:
   RFC3596:
   RFC4034:
+
+informative:
   RFC8484:
-  RFC5910:
   RFC9250:
   I-D.draft-ietf-deleg:
-  I-D.draft-bortzmeyer-dns-json-01:
-  # FRED?
-  # RRI?
 ...
 
 --- abstract
