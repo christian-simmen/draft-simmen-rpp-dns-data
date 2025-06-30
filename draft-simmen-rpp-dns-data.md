@@ -80,7 +80,7 @@ This document proposes a unified, extensible JSON representation for DNS resourc
 
 # Introduction
 
-The Extensible Provisioning Protocol (EPP) has manages DNS delegation data using distinct object types and extensions. Host Objects {{RFC5732}} are used for nameservers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension {{RFC5910}}. Nameserver information can be also directly attached to a domain name as a set of Host Attributes {{RFC5731}}. More recently, control over Time-to-Live (TTL) values was added through another extension {{RFC9803}}.
+The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects {{RFC5732}} are used for nameservers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension {{RFC5910}}. Nameserver information can be also directly attached to a domain name as a set of Host Attributes {{RFC5731}}. More recently, control over Time-to-Live (TTL) values was added through another extension {{RFC9803}}.
 
 While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS {{RFC8484}} and DNS-over-QUIC {{RFC9250}} driving the need for more sophisticated delegation information, such as the proposed DELEG record type {{I-D.draft-ietf-deleg}}.
 
