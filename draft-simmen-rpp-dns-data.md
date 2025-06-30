@@ -142,6 +142,7 @@ Delegation data, as well as DNSSEC data, is intended to find it's way into the p
 ~~~~
 
 ### DNS record structure representation
+
 #### name
 
 The owner name of the DNS entry which MAY be the domain itself or a subordinate hostname. A server MUST NOT accept a NAME which is not a subordinate label to the provisioned domain name.
@@ -155,6 +156,7 @@ A server MUST accept values as "@", "relative names" and fully qualified domain 
 "FQDN" identified by a trailing dot (".") MUST NOT be interpreted by the server. A server MUST check if the provided name is a subordinate to the provisioned domain, or the domain itself.
 
 Example:
+
 ~~~~
     {
       "domain": "example.com",
@@ -183,6 +185,7 @@ Example:
       ]
     }
 ~~~~
+
 would imply three resulting records:
 An A RR for "example.com" ("@") set to 1.1.1.1.
 An A RR for "www.example.com" ("www" relative) set to 2.2.2.2.
@@ -214,6 +217,7 @@ Example:
 Section 3.3.11 NS RDATA format of {{RFC1035}} describes the RDATA of a NS RR as "NSDNAME".
 Section 3.3.9 MX RDATA format of {{RFC1035}} describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
 The resulting structure is therefore:
+
 ~~~~
     {
       "domain": "example.com",
@@ -427,7 +431,7 @@ A client MAY add maximum_signature_lifetime to the controls of an entry which is
           "name": "@",
           "type": "DS",
           "rdata": {
-            "key_tag": "370,
+            "key_tag": 370,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
