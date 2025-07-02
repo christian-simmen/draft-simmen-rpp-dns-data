@@ -503,7 +503,11 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 ~~~~
 
 # Signaling supported record types
-The server MUST provide a list of supported record types to the client.
+
+The server MUST provide a structured document to the client which provides
+* a list of supported record types
+* a list of applicable controls
+* minimum, maximum and default values for controls
 
 # Conventions and Definitions
 
