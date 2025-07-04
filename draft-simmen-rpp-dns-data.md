@@ -54,23 +54,23 @@ author:
     email: simmen@denic.de
 
 normative:
-  I-D.draft-wullink-rpp-requirements:
-  I-D.draft-kowalik-rpp-architecture:
   RFC1035:
-  RFC4627:
   RFC5732:
   RFC5910:
   RFC5731:
   RFC9803:
   RFC3596:
   RFC4034:
-  I-D.draft-brown-rdap-ttl-extension:
 
 informative:
   RFC8484:
   RFC9250:
   RFC9499:
   I-D.draft-ietf-deleg:
+  I-D.draft-wullink-rpp-requirements:
+  I-D.draft-ietf-regext-epp-delete-bcp:
+  #I-D.draft-kowalik-rpp-architecture:
+  #I-D.draft-brown-rdap-ttl-extension:
 ...
 
 --- abstract
@@ -477,9 +477,9 @@ Example:
     }
 ~~~~
 
-### Other DNS data
+### Authoritative DNS data
 
-A server MAY support additional RR types, e.g. to support delegation-less provisioning.
+A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators nameservers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
 
 ~~~~
 {
@@ -561,8 +561,26 @@ The server MUST provide a structured document to the client which provides
 
 # Security Considerations
 
-A server SHOULD choose the supported record types wisely and MAY restrict the number of accepted entries.
-Also see security considerations of {{RFC4627}}.
+## Authoritative data
+
+Allowing to store authoritative resource records (see section 3.2.4) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers MUST take precautions to not store authoritative and non-authoritative data at the same time.
+
+The types and number of authoritative records can result in uncontrolled growth of the registries zone file and eventually exhaust the hardware resources of the registries name server. RPP servers SHOULD consider limiting the amount of authoritative records and carefully choose which record types are allowed.
+
+## Host references within the rdata field
+
+Some RR types (NS, MX and others) use references to host names which can be categorized into three categories:
+
+Domain internal references
+are references to a subordinate host name of the domain. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example.com".
+
+Registry internal references
+are references to a host name within the same regitry. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example2.com".
+
+Reistry external references
+are references to a host name outside of the regitry. E.g. "ns.example.net" is an domain internal reference when used as a name server for "example.com".
+
+Deletion of a host name while still being referenced may lead to severe security risks for the referencing domain.
 
 
 # IANA Considerations
