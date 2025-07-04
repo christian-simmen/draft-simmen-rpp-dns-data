@@ -53,8 +53,8 @@ author:
     email: simmen@denic.de
 
 normative:
-  I.D.draft-wullink-rpp-requirements:
-  I.D.draft-kowalik-rpp-architecture:
+  I-D.draft-wullink-rpp-requirements:
+  I-D.draft-kowalik-rpp-architecture:
   RFC1035:
   RFC4627:
   RFC5732:
@@ -63,10 +63,12 @@ normative:
   RFC9803:
   RFC3596:
   RFC4034:
+  I-D.draft-brown-rdap-ttl-extension:
 
 informative:
   RFC8484:
   RFC9250:
+  RFC9499:
   I-D.draft-ietf-deleg:
 ...
 
@@ -191,7 +193,7 @@ If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} 
 
 #### ttl
 
-A server MUST set a default value as TTL and MAY decline other values. A client SHOULD omit this value.
+TTL is considered a operational control (see section 3.1.3 Operational controls and section 3.2.3.1 TTL). A server MUST set a default value as TTL and MAY ignore other values send by a client.
 
 #### rdlength
 
@@ -229,10 +231,10 @@ The resulting structure is therefore:
     }
 ~~~~
 
-### Additional controls
+### Operational controls
 
 In addition to the regular data a server MAY allow a client to control specific operational behavior.
-A client MAY add an JSON object with a number of "controls" to the DNS dataset.
+A client MAY add an JSON object with a number of "dns_controls" to the domain object.
 
 ~~~~
     {
@@ -244,11 +246,11 @@ A client MAY add an JSON object with a number of "controls" to the DNS dataset.
           "rdata": {
             "rdata_key": "<rdata_value>",
           }
-          "controls": {
-            "<named_control>": "<named_control_value>"
-          }
         }
-      ]
+      ],
+      "dns_controls": {
+        "<named_control>": "<named_control_value>"
+      }
     }
 ~~~~
 
@@ -392,10 +394,49 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-### Maximum signature lifetime
+### Setting operational controls
+
+#### TTL
+
+The TTL controls the caching behavior of DNS resource records (see Section 5 of {{RFC9499}}). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.
+
+A client MAY assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+
+Example:
+
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "a",
+          "rdata": {
+            "address": "1.2.3.4"
+          }
+        },
+        {
+          "name": "@",
+          "type": "aaaa",
+          "rdata": {
+            "address": "dead::beef"
+          }
+        },
+      ],
+      "dns_controls": {
+        "ttl": {
+          "a": 86400
+          "aaaa": 3600
+      }
+    }
+~~~~
+
+#### Maximum signature lifetime
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
 
-A client MAY add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server MAY ignore this value, e.g. for policy reasons.
+A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+
+Example:
 
 ~~~~
     {
@@ -424,11 +465,13 @@ A client MAY add maximum_signature_lifetime to the controls of an entry which is
             "digest_type": 2,
             "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
           },
-          "controls": {
-            "maximum_signature_lifetime": 86400
-          }
         }
-      ]
+      ],
+      "dns_controls": {
+        "maximum_signature_lifetime": {
+          "ds": 86400
+        }
+      }
     }
 ~~~~
 
@@ -506,8 +549,8 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 
 The server MUST provide a structured document to the client which provides
 * a list of supported record types
-* a list of applicable controls
-* minimum, maximum and default values for controls
+* a list of applicable dns_controls
+* minimum, maximum and default values for dns_controls
 
 # Conventions and Definitions
 
