@@ -53,8 +53,8 @@ author:
     email: simmen@denic.de
 
 normative:
-  I.D.draft-wullink-rpp-requirements:
-  I.D.draft-kowalik-rpp-architecture:
+  I-D.draft-wullink-rpp-requirements:
+  I-D.draft-kowalik-rpp-architecture:
   RFC1035:
   RFC4627:
   RFC5732:
@@ -63,10 +63,12 @@ normative:
   RFC9803:
   RFC3596:
   RFC4034:
+  I-D.draft-brown-rdap-ttl-extension:
 
 informative:
   RFC8484:
   RFC9250:
+  RFC9499:
   I-D.draft-ietf-deleg:
 ...
 
@@ -151,21 +153,21 @@ Example:
       "dns": [
         {
           "name": "@",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "1.1.1.1"
           }
         },
         {
           "name": "www",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "2.2.2.2"
           }
         },
         {
           "name": "web.example.com.",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "3.3.3.3"
           }
@@ -187,11 +189,11 @@ If present the value MUST be chosen from section 3.2.4. CLASS values of {{RFC103
 #### type
 
 The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
-If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} or other RFC describing the RR TYPE.
+If present the value MUST chosen from section 3.2.2. TYPE values, converted to lower case, of {{RFC1035}} or other RFC describing the RR TYPE.
 
 #### ttl
 
-A server MUST set a default value as TTL and MAY decline other values. A client SHOULD omit this value.
+TTL is considered a operational control (see section 3.1.3 Operational controls and section 3.2.3.1 TTL). A server MUST set a default value as TTL and MAY ignore other values send by a client.
 
 #### rdlength
 
@@ -212,14 +214,14 @@ The resulting structure is therefore:
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "MX",
+          "type": "mx",
           "rdata": {
             "preference": "10",
             "exchange": "mx1.example.net"
@@ -229,10 +231,10 @@ The resulting structure is therefore:
     }
 ~~~~
 
-### Additional controls
+### Operational controls
 
 In addition to the regular data a server MAY allow a client to control specific operational behavior.
-A client MAY add an JSON object with a number of "controls" to the DNS dataset.
+A client MAY add an JSON object with a number of "dns_controls" to the domain object.
 
 ~~~~
     {
@@ -244,11 +246,11 @@ A client MAY add an JSON object with a number of "controls" to the DNS dataset.
           "rdata": {
             "rdata_key": "<rdata_value>",
           }
-          "controls": {
-            "<named_control>": "<named_control_value>"
-          }
         }
-      ]
+      ],
+      "dns_controls": {
+        "<named_control>": "<named_control_value>"
+      }
     }
 ~~~~
 
@@ -270,14 +272,14 @@ A minimal delegation can be expressed by adding an array of name servers to the 
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
@@ -294,28 +296,28 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "ns.example.com"
           }
         },
         {
           "name": "ns.example.com.",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "1.2.3.4"
           }
         },
         {
           "name": "ns.example.com.",
-          "type": "AAAA",
+          "type": "aaaa",
           "rdata": {
             "address": "dead::beef"
           }
@@ -334,21 +336,21 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DS",
+          "type": "ds",
           "rdata": {
             "key_tag": 370,
             "algorithm": 13,
@@ -366,21 +368,21 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DNSKEY",
+          "type": "dnskey",
           "rdata": {
             "flags": 257,
             "protocol": 3,
@@ -392,10 +394,15 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-### Maximum signature lifetime
-Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
+### Setting operational controls
 
-A client MAY add maximum_signature_lifetime to the controls of an entry which is intended to be signed on the parent side. A server MAY ignore this value, e.g. for policy reasons.
+#### TTL
+
+The TTL controls the caching behavior of DNS resource records (see Section 5 of {{RFC9499}}). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.
+
+A client MAY assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+
+Example:
 
 ~~~~
     {
@@ -403,32 +410,68 @@ A client MAY add maximum_signature_lifetime to the controls of an entry which is
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "a",
+          "rdata": {
+            "address": "1.2.3.4"
+          }
+        },
+        {
+          "name": "@",
+          "type": "aaaa",
+          "rdata": {
+            "address": "dead::beef"
+          }
+        },
+      ],
+      "dns_controls": {
+        "ttl": {
+          "a": 86400
+          "aaaa": 3600
+      }
+    }
+~~~~
+
+#### Maximum signature lifetime
+Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
+
+A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+
+Example:
+
+~~~~
+    {
+      "domain": "example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DS",
+          "type": "ds",
           "rdata": {
             "key_tag": 370,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
           },
-          "controls": {
-            "maximum_signature_lifetime": 86400
-          }
         }
-      ]
+      ],
+      "dns_controls": {
+        "maximum_signature_lifetime": {
+          "ds": 86400
+        }
+      }
     }
 ~~~~
 
@@ -442,35 +485,35 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
   "dns": [
     {
       "name": "@",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "1.2.3.4"
       }
     },
     {
       "name": "www.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "1.2.3.4"
       }
     },
     {
       "name": "@",
-      "type": "AAAA",
+      "type": "aaaa",
       "rdata": {
         "address": "dead::beef"
       }
     },
     {
       "name": "www.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "dead::beef"
       }
     },
     {
       "name": "@",
-      "type": "MX",
+      "type": "mx",
       "rdata": {
         "preference": "10",
         "exchange": "mx1.example.com"
@@ -478,14 +521,14 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
     },
     {
       "name": "mx1.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "5.6.7.8"
       }
     },
     {
       "name": "@",
-      "type": "MX",
+      "type": "mx",
       "rdata": {
         "preference": "20",
         "exchange": "mx2.example.net"
@@ -493,7 +536,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
     },
     {
       "name": "@",
-      "type": "TXT",
+      "type": "txt",
       "rdata": {
         "txt_data": "v=spf1 -all"
       }
@@ -503,7 +546,11 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 ~~~~
 
 # Signaling supported record types
-The server MUST provide a list of supported record types to the client.
+
+The server MUST provide a structured document to the client which provides
+* a list of supported record types
+* a list of applicable dns_controls
+* minimum, maximum and default values for dns_controls
 
 # Conventions and Definitions
 
