@@ -547,7 +547,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 }
 ~~~~
 
-# Signaling supported record types
+# Discoverability of supported RR types and operational controls
 
 The server MUST provide a structured document to the client which provides
 * a list of supported record types
