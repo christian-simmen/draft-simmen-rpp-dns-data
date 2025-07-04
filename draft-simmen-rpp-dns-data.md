@@ -20,13 +20,13 @@
 #
 ###
 title: "DNS data representation for use in RESTful Provisioning Protocol (RPP)"
-abbrev: "RPP DNS"
+abbrev: "RPP DNS data representation"
 category: info
 
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-06-30
+date: 2025-07-04
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -50,6 +50,7 @@ author:
  -
     fullname: Christian Simmen
     organization: DENIC eG
+    country: DE
     email: simmen@denic.de
 
 normative:
@@ -74,7 +75,7 @@ informative:
 
 --- abstract
 
-This document proposes a unified, extensible JSON representation for DNS resource records for use in the RESTful Provisioning Protocol (RPP). The aim is to create a single, consistent structure for provisioning all DNS-related data—including delegation, DNSSEC, and other record types—that directly mirrors the DNS data model and being mappable to existing EPP model of requests and responses same time. This approach simplifies the adoption of both current and future DNS features by aligning the provisioning format with the target system, thereby streamlining the management of domain names and related objects within RPP.
+This document proposes a unified, extensible JSON representation for DNS resource records for use in the RESTful Provisioning Protocol (RPP). The aim is to create a single, consistent structure for provisioning all DNS-related data - including delegation, DNSSEC, and other record types - that directly mirrors the DNS data model and being mappable to existing EPP model of requests and responses same time. This approach simplifies the adoption of both current and future DNS features by aligning the provisioning format with the target system, thereby streamlining the management of domain names and related objects within RPP.
 
 --- middle
 
@@ -155,21 +156,21 @@ Example:
           "name": "@",
           "type": "a",
           "rdata": {
-            "address": "1.1.1.1"
+            "address": "192.0.2.1"
           }
         },
         {
           "name": "www",
           "type": "a",
           "rdata": {
-            "address": "2.2.2.2"
+            "address": "192.0.2.2"
           }
         },
         {
           "name": "web.example.com.",
           "type": "a",
           "rdata": {
-            "address": "3.3.3.3"
+            "address": "192.0.2.3"
           }
         }
       ]
@@ -177,9 +178,9 @@ Example:
 ~~~~
 
 would imply three resulting records:
-An A RR for "example.com" ("@") set to 1.1.1.1.
-An A RR for "www.example.com" ("www" relative) set to 2.2.2.2.
-An A RR for "web.example.com" (FQDN) set to 3.3.3.3.
+An A RR for "example.com" ("@") set to 192.0.2.1.
+An A RR for "www.example.com" ("www" relative) set to 192.0.2.2.
+An A RR for "web.example.com" (FQDN) set to 192.0.2.3.
 
 #### class
 
@@ -312,14 +313,14 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
           "name": "ns.example.com.",
           "type": "a",
           "rdata": {
-            "address": "1.2.3.4"
+            "address": "192.0.2.1"
           }
         },
         {
           "name": "ns.example.com.",
           "type": "aaaa",
           "rdata": {
-            "address": "dead::beef"
+            "address": "2001:DB8::1"
           }
         }
       ]
@@ -355,7 +356,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
             "key_tag": 370,
             "algorithm": 13,
             "digest_type": 2,
-            "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+            "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
           }
         }
       ]
@@ -387,7 +388,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
             "flags": 257,
             "protocol": 3,
             "algorithm": 13,
-            "public_key": "kXKkvWU3vGYfTJGl3qBd4qhiWp5aRs7YtkCJxD2d+t7KXqwahww5IgJtxJT2yFItlggazyfXqJEVOmMJ3qT0tQ=="
+            "public_key": "kXKkvWU3vGYfTyfXqJEVOmMJ3qT0tQ=="
           }
         }
       ]
@@ -412,14 +413,14 @@ Example:
           "name": "@",
           "type": "a",
           "rdata": {
-            "address": "1.2.3.4"
+            "address": "192.0.2.1"
           }
         },
         {
           "name": "@",
           "type": "aaaa",
           "rdata": {
-            "address": "dead::beef"
+            "address": "2001:DB8::1"
           }
         },
       ],
@@ -432,6 +433,7 @@ Example:
 ~~~~
 
 #### Maximum signature lifetime
+
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
 
 A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
@@ -463,7 +465,7 @@ Example:
             "key_tag": 370,
             "algorithm": 13,
             "digest_type": 2,
-            "digest": "BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+            "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
           },
         }
       ],
@@ -487,28 +489,28 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
       "name": "@",
       "type": "a",
       "rdata": {
-        "address": "1.2.3.4"
+        "address": "192.0.2.1"
       }
     },
     {
       "name": "www.example.com.",
       "type": "a",
       "rdata": {
-        "address": "1.2.3.4"
+        "address": "192.0.2.1"
       }
     },
     {
       "name": "@",
       "type": "aaaa",
       "rdata": {
-        "address": "dead::beef"
+        "address": "2001:DB8::1"
       }
     },
     {
       "name": "www.example.com.",
       "type": "a",
       "rdata": {
-        "address": "dead::beef"
+        "address": "2001:DB8::1"
       }
     },
     {
@@ -523,7 +525,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
       "name": "mx1.example.com.",
       "type": "a",
       "rdata": {
-        "address": "5.6.7.8"
+        "address": "192.0.2.2"
       }
     },
     {
