@@ -153,21 +153,21 @@ Example:
       "dns": [
         {
           "name": "@",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "1.1.1.1"
           }
         },
         {
           "name": "www",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "2.2.2.2"
           }
         },
         {
           "name": "web.example.com.",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "3.3.3.3"
           }
@@ -189,7 +189,7 @@ If present the value MUST be chosen from section 3.2.4. CLASS values of {{RFC103
 #### type
 
 The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
-If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} or other RFC describing the RR TYPE.
+If present the value MUST chosen from section 3.2.2. TYPE values, converted to lower case, of {{RFC1035}} or other RFC describing the RR TYPE.
 
 #### ttl
 
@@ -214,14 +214,14 @@ The resulting structure is therefore:
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "MX",
+          "type": "mx",
           "rdata": {
             "preference": "10",
             "exchange": "mx1.example.net"
@@ -272,14 +272,14 @@ A minimal delegation can be expressed by adding an array of name servers to the 
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
@@ -296,28 +296,28 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "ns.example.com"
           }
         },
         {
           "name": "ns.example.com.",
-          "type": "A",
+          "type": "a",
           "rdata": {
             "address": "1.2.3.4"
           }
         },
         {
           "name": "ns.example.com.",
-          "type": "AAAA",
+          "type": "aaaa",
           "rdata": {
             "address": "dead::beef"
           }
@@ -336,21 +336,21 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DS",
+          "type": "ds",
           "rdata": {
             "key_tag": 370,
             "algorithm": 13,
@@ -368,21 +368,21 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DNSKEY",
+          "type": "dnskey",
           "rdata": {
             "flags": 257,
             "protocol": 3,
@@ -444,21 +444,21 @@ Example:
       "dns": [
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "a.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "NS",
+          "type": "ns",
           "rdata": {
             "nsdname": "b.iana-servers.net."
           }
         },
         {
           "name": "@",
-          "type": "DS",
+          "type": "ds",
           "rdata": {
             "key_tag": 370,
             "algorithm": 13,
@@ -485,35 +485,35 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
   "dns": [
     {
       "name": "@",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "1.2.3.4"
       }
     },
     {
       "name": "www.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "1.2.3.4"
       }
     },
     {
       "name": "@",
-      "type": "AAAA",
+      "type": "aaaa",
       "rdata": {
         "address": "dead::beef"
       }
     },
     {
       "name": "www.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "dead::beef"
       }
     },
     {
       "name": "@",
-      "type": "MX",
+      "type": "mx",
       "rdata": {
         "preference": "10",
         "exchange": "mx1.example.com"
@@ -521,14 +521,14 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
     },
     {
       "name": "mx1.example.com.",
-      "type": "A",
+      "type": "a",
       "rdata": {
         "address": "5.6.7.8"
       }
     },
     {
       "name": "@",
-      "type": "MX",
+      "type": "mx",
       "rdata": {
         "preference": "20",
         "exchange": "mx2.example.net"
@@ -536,7 +536,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
     },
     {
       "name": "@",
-      "type": "TXT",
+      "type": "txt",
       "rdata": {
         "txt_data": "v=spf1 -all"
       }
