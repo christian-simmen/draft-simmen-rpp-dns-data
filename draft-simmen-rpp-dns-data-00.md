@@ -26,7 +26,7 @@ category: info
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-07-04
+date: 2025-07-05
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -61,15 +61,15 @@ normative:
   RFC9803:
   RFC3596:
   RFC4034:
-  RFC7483:
+  RFC9083:
 
 informative:
   RFC8484:
   RFC9250:
   RFC9499:
   I-D.draft-ietf-deleg:
-  I-D.draft-wullink-rpp-requirements:
-  I-D.draft-ietf-regext-epp-delete-bcp:
+  #I-D.draft-wullink-rpp-requirements:
+  #I-D.draft-ietf-regext-epp-delete-bcp:
   #I-D.draft-kowalik-rpp-architecture:
   I-D.draft-brown-rdap-ttl-extension:
 ...
@@ -835,7 +835,7 @@ RRI is a proprietary protocol developed by DENIC
 
 ## RDAP
 
-Registration Data Access Protocol (RDAP) is described in {{RFC7483}}. An extention proposing Time-to-Live (TTL) values is described in
+Registration Data Access Protocol (RDAP) is described in {{RFC9083}}. An extention proposing Time-to-Live (TTL) values is described in
 {{I-D.draft-brown-rdap-ttl-extension}} and is close to adoption in the regext working group.
 
 ~~~~ json
