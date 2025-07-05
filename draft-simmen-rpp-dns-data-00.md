@@ -82,13 +82,13 @@ This document proposes a unified, extensible JSON representation for DNS resourc
 
 # Introduction
 
-The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects {{RFC5732}} are used for nameservers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension {{RFC5910}}. Nameserver information can be also directly attached to a domain name as a set of Host Attributes {{RFC5731}}. More recently, control over Time-to-Live (TTL) values was added through another extension {{RFC9803}}.
+The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects {{RFC5732}} are used for name servers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension {{RFC5910}}. Name server information can be also directly attached to a domain name as a set of Host Attributes {{RFC5731}}. More recently, control over Time-to-Live (TTL) values was added through another extension {{RFC9803}}.
 
 While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS {{RFC8484}} and DNS-over-QUIC {{RFC9250}} driving the need for more sophisticated delegation information, such as the proposed DELEG record type {{I-D.draft-ietf-deleg}}.
 
-Some registry operators have developed their own proprietary solutions. These include grouping nameservers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.
+Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.
 
-The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like nameserver sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.
+The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like name server sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.
 
 # Domain Names in DNS
 
@@ -218,7 +218,7 @@ The resulting structure is therefore:
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
@@ -276,14 +276,14 @@ A minimal delegation can be expressed by adding an array of name servers to the 
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         }
       ]
@@ -300,7 +300,7 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
@@ -340,14 +340,14 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -372,14 +372,14 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -450,14 +450,14 @@ Example:
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -481,7 +481,7 @@ Example:
 
 ### Authoritative DNS data
 
-A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators nameservers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
+A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
 
 ~~~~ json
 {
@@ -577,10 +577,10 @@ Domain internal references
 are references to a subordinate host name of the domain. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example.com".
 
 Registry internal references
-are references to a host name within the same regitry. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example2.com".
+are references to a host name within the same registry. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example2.com".
 
-Reistry external references
-are references to a host name outside of the regitry. E.g. "ns.example.net" is an domain internal reference when used as a name server for "example.com".
+Registry external references
+are references to a host name outside of the registry. E.g. "ns.example.net" is an domain internal reference when used as a name server for "example.com".
 
 Deletion of a host name while still being referenced may lead to severe security risks for the referencing domain.
 

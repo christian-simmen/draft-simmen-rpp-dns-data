@@ -115,12 +115,12 @@ Table of Contents
 
    The Extensible Provisioning Protocol (EPP) manages DNS delegation
    data using distinct object types and extensions.  Host Objects
-   [RFC5732] are used for nameservers (NS records) and their associated
+   [RFC5732] are used for name servers (NS records) and their associated
    addresses (glue A/AAAA records), while DNSSEC data is handled via a
-   separate security extension [RFC5910].  Nameserver information can be
-   also directly attached to a domain name as a set of Host Attributes
-   [RFC5731].  More recently, control over Time-to-Live (TTL) values was
-   added through another extension [RFC9803].
+   separate security extension [RFC5910].  Name server information can
+   be also directly attached to a domain name as a set of Host
+   Attributes [RFC5731].  More recently, control over Time-to-Live (TTL)
+   values was added through another extension [RFC9803].
 
    While functional, this segmented approach creates complexity.  The
    DNS landscape itself is evolving, with new transport protocols like
@@ -129,10 +129,10 @@ Table of Contents
    DELEG record type [I-D.draft-ietf-deleg].
 
    Some registry operators have developed their own proprietary
-   solutions.  These include grouping nameservers into "sets" for easier
-   management or allowing domains to be provisioned with arbitrary DNS
-   resource records without formal delegation, which is expanding on
-   Host Attribute model with other Resource Record types.
+   solutions.  These include grouping name servers into "sets" for
+   easier management or allowing domains to be provisioned with
+   arbitrary DNS resource records without formal delegation, which is
+   expanding on Host Attribute model with other Resource Record types.
 
    The development of the RESTful Provisioning Protocol (RPP) provides
    an opportunity to address this fragmentation.  This document proposes
@@ -145,8 +145,8 @@ Table of Contents
    record types, this model can be applied across various contexts.  It
    is designed to be equally applicable whether a registry uses separate
    host objects, host attributes within a domain, or more abstract
-   concepts like nameserver sets, thereby simplifying implementation and
-   ensuring adaptability for future developments in the DNS.
+   concepts like name server sets, thereby simplifying implementation
+   and ensuring adaptability for future developments in the DNS.
 
 2.  Domain Names in DNS
 
@@ -301,7 +301,7 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
@@ -359,14 +359,14 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "b.iana-servers.net."
+               "nsdname": "ns2.example.net."
              }
            }
          ]
@@ -382,7 +382,7 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
@@ -424,14 +424,14 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "b.iana-servers.net."
+               "nsdname": "ns2.example.net."
              }
            },
            {
@@ -454,14 +454,14 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "b.iana-servers.net."
+               "nsdname": "ns2.example.net."
              }
            },
            {
@@ -540,14 +540,14 @@ Table of Contents
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "a.iana-servers.net."
+               "nsdname": "ns1.example.net."
              }
            },
            {
              "name": "@",
              "type": "ns",
              "rdata": {
-               "nsdname": "b.iana-servers.net."
+               "nsdname": "ns2.example.net."
              }
            },
            {
@@ -571,7 +571,7 @@ Table of Contents
 3.2.4.  Authoritative DNS data
 
    A server MAY support additional RR types, e.g. to support delegation-
-   less provisioning.  By doing this the registry operators nameservers
+   less provisioning.  By doing this the registry operators name servers
    becomes authoritative for the registered domain.  A server MUST
    consider resource records designed for delegation - including DNSSEC
    - and resource records representing authoritative data - except for
@@ -681,11 +681,11 @@ Table of Contents
    when used as a name server for "example.com".
 
    Registry internal references are references to a host name within the
-   same regitry.  E.g. "ns.example.com" is an domain internal reference
+   same registry.  E.g. "ns.example.com" is an domain internal reference
    when used as a name server for "example2.com".
 
-   Reistry external references are references to a host name outside of
-   the regitry.  E.g. "ns.example.net" is an domain internal reference
+   Registry external references are references to a host name outside of
+   the registry.  E.g. "ns.example.net" is an domain internal reference
    when used as a name server for "example.com".
 
    Deletion of a host name while still being referenced may lead to

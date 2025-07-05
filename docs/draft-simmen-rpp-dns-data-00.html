@@ -1451,10 +1451,10 @@ li > p:last-of-type:only-child {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span> are used for nameservers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension <span>[<a href="#RFC5910" class="cite xref">RFC5910</a>]</span>. Nameserver information can be also directly attached to a domain name as a set of Host Attributes <span>[<a href="#RFC5731" class="cite xref">RFC5731</a>]</span>. More recently, control over Time-to-Live (TTL) values was added through another extension <span>[<a href="#RFC9803" class="cite xref">RFC9803</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">The Extensible Provisioning Protocol (EPP) manages DNS delegation data using distinct object types and extensions. Host Objects <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span> are used for name servers (NS records) and their associated addresses (glue A/AAAA records), while DNSSEC data is handled via a separate security extension <span>[<a href="#RFC5910" class="cite xref">RFC5910</a>]</span>. Name server information can be also directly attached to a domain name as a set of Host Attributes <span>[<a href="#RFC5731" class="cite xref">RFC5731</a>]</span>. More recently, control over Time-to-Live (TTL) values was added through another extension <span>[<a href="#RFC9803" class="cite xref">RFC9803</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS <span>[<a href="#RFC8484" class="cite xref">RFC8484</a>]</span> and DNS-over-QUIC <span>[<a href="#RFC9250" class="cite xref">RFC9250</a>]</span> driving the need for more sophisticated delegation information, such as the proposed DELEG record type <span>[<a href="#I-D.draft-ietf-deleg" class="cite xref">I-D.draft-ietf-deleg</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Some registry operators have developed their own proprietary solutions. These include grouping nameservers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like nameserver sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-3">Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like name server sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="domain-names-in-dns">
@@ -1612,7 +1612,7 @@ The resulting structure is therefore:<a href="#section-3.1.2.6-2" class="pilcrow
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
@@ -1690,14 +1690,14 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         }
       ]
@@ -1714,7 +1714,7 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
@@ -1759,14 +1759,14 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -1792,14 +1792,14 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -1879,14 +1879,14 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "a.iana-servers.net."
+            "nsdname": "ns1.example.net."
           }
         },
         {
           "name": "@",
           "type": "ns",
           "rdata": {
-            "nsdname": "b.iana-servers.net."
+            "nsdname": "ns2.example.net."
           }
         },
         {
@@ -1917,7 +1917,7 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
           <h4 id="name-authoritative-dns-data">
 <a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-authoritative-dns-data" class="section-name selfRef">Authoritative DNS data</a>
           </h4>
-<p id="section-3.2.4-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators nameservers becomes authoritative for the registered domain. A server <span class="bcp14">MUST</span> consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.4-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server <span class="bcp14">MUST</span> consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
 <div class="breakable lang-json sourcecode" id="section-3.2.4-2">
 <pre>
 {
@@ -2036,9 +2036,9 @@ appear in all capitals, as shown here.<a href="#section-5-1" class="pilcrow">¶<
 <p id="section-6.2-2">Domain internal references
 are references to a subordinate host name of the domain. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example.com".<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2-3">Registry internal references
-are references to a host name within the same regitry. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example2.com".<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">Reistry external references
-are references to a host name outside of the regitry. E.g. "ns.example.net" is an domain internal reference when used as a name server for "example.com".<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+are references to a host name within the same registry. E.g. "ns.example.com" is an domain internal reference when used as a name server for "example2.com".<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">Registry external references
+are references to a host name outside of the registry. E.g. "ns.example.net" is an domain internal reference when used as a name server for "example.com".<a href="#section-6.2-4" class="pilcrow">¶</a></p>
 <p id="section-6.2-5">Deletion of a host name while still being referenced may lead to severe security risks for the referencing domain.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
