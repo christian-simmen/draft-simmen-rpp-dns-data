@@ -118,7 +118,7 @@ RDATA     The actual payload data. Structures defer for each type.
 ### DNS data extending an domain object
 Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an array of DNS entries. The properties of an object in this array MUST be a representation of the top level format as described in section 3.2.1 of {{RFC1035}}. All keys MUST be lowercase. Whitespaces MUST be translated to underscores ("_").
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -149,7 +149,7 @@ A server MUST accept values as "@", "relative names" and fully qualified domain 
 
 Example:
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -210,7 +210,7 @@ Section 3.3.11 NS RDATA format of {{RFC1035}} describes the RDATA of a NS RR as 
 Section 3.3.9 MX RDATA format of {{RFC1035}} describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
 The resulting structure is therefore:
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -238,7 +238,7 @@ The resulting structure is therefore:
 In addition to the regular data a server MAY allow a client to control specific operational behavior.
 A client MAY add an JSON object with a number of "dns_controls" to the domain object.
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -246,7 +246,7 @@ A client MAY add an JSON object with a number of "dns_controls" to the domain ob
           "name": "<name>",
           "type": "<type>",
           "rdata": {
-            "rdata_key": "<rdata_value>",
+            "rdata_key": "<rdata_value>"
           }
         }
       ],
@@ -268,7 +268,7 @@ To enable domain delegation a server MUST support the "NS", "A" and "AAAA" recor
 
 A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -292,7 +292,7 @@ A minimal delegation can be expressed by adding an array of name servers to the 
 
 If GLUE records are needed the client may add records of type "A" or "AAAA" :
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -332,7 +332,7 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
 
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -364,7 +364,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-~~~~
+~~~~ json
     {
       "domain": "example.com.",
       "dns": [
@@ -406,7 +406,7 @@ A client MAY assign "ttl" to the dns_controls of an RR set which is intended to 
 
 Example:
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -423,12 +423,13 @@ Example:
           "rdata": {
             "address": "2001:DB8::1"
           }
-        },
+        }
       ],
       "dns_controls": {
         "ttl": {
-          "a": 86400
+          "a": 86400,
           "aaaa": 3600
+       }
       }
     }
 ~~~~
@@ -441,7 +442,7 @@ A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR se
 
 Example:
 
-~~~~
+~~~~ json
     {
       "domain": "example.com",
       "dns": [
@@ -467,7 +468,7 @@ Example:
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
-          },
+          }
         }
       ],
       "dns_controls": {
@@ -482,7 +483,7 @@ Example:
 
 A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators nameservers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
 
-~~~~
+~~~~ json
 {
   "domain": "example.com",
   "dns": [
