@@ -61,6 +61,7 @@ normative:
   RFC9803:
   RFC3596:
   RFC4034:
+  RFC7483:
 
 informative:
   RFC8484:
@@ -70,7 +71,7 @@ informative:
   I-D.draft-wullink-rpp-requirements:
   I-D.draft-ietf-regext-epp-delete-bcp:
   #I-D.draft-kowalik-rpp-architecture:
-  #I-D.draft-brown-rdap-ttl-extension:
+  I-D.draft-brown-rdap-ttl-extension:
 ...
 
 --- abstract
@@ -353,7 +354,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "name": "@",
           "type": "ds",
           "rdata": {
-            "key_tag": 370,
+            "key_tag": 12345,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
@@ -387,8 +388,8 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "rdata": {
             "flags": 257,
             "protocol": 3,
-            "algorithm": 13,
-            "public_key": "kXKkvWU3vGYfTyfXqJEVOmMJ3qT0tQ=="
+            "algorithm": 5,
+            "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
           }
         }
       ]
@@ -462,7 +463,7 @@ Example:
           "name": "@",
           "type": "ds",
           "rdata": {
-            "key_tag": 370,
+            "key_tag": 12345,
             "algorithm": 13,
             "digest_type": 2,
             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
@@ -587,8 +588,307 @@ Deletion of a host name while still being referenced may lead to severe security
 
 This document has no IANA actions.
 
-# Appendix
+# Appendix A. Examples from current implementations
 
+## EPP
+
+### Create domain using host attributes example
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <domain:create
+          xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>example.com</domain:name>
+        <domain:period unit="y">1</domain:period>
+        <domain:ns>
+          <domain:hostAttr>
+            <domain:hostName>ns1.example.com</domain:hostName>
+            <domain:hostAddr ip="v4">192.0.2.1</domain:hostAddr>
+            <domain:hostAddr ip="v6">2001:db8::1</domain:hostAddr>
+          </domain:hostAttr>
+          <domain:hostAttr>
+            <domain:hostName>ns2.example.com</domain:hostName>
+            <domain:hostAddr ip="v4">192.0.2.2</domain:hostAddr>
+          </domain:hostAttr>
+        </domain:ns>
+        <domain:registrant>registrantID</domain:registrant>
+        <domain:contact type="admin">adminID</domain:contact>
+        <domain:contact type="tech">techID</domain:contact>
+      </domain:create>
+    </create>
+    <extension>
+      <secDNS:create
+          xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+        <secDNS:maxSigLife>604800</secDNS:maxSigLife>
+        <secDNS:dsData>
+          <secDNS:keyTag>12345</secDNS:keyTag>
+          <secDNS:alg>13</secDNS:alg>
+          <secDNS:digestType>2</secDNS:digestType>
+          <secDNS:digest>
+            BE74359954660069D5C632B56F120EE9F3A86764247
+          </secDNS:digest>
+        </secDNS:dsData>
+      </secDNS:create>
+      <ttl:create xmlns:ttl="urn:ietf:params:xml:ns:epp:ttl-1.0">
+        <ttl:ttl for="NS">3600</ttl:ttl>
+      </ttl:create>
+    </extension>
+    <clTRID>clTRID-1234</clTRID>
+  </command>
+</epp>
+~~~~
+
+### ### Create domain using host object example
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <domain:create
+          xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+        <domain:name>example.com</domain:name>
+        <domain:period unit="y">1</domain:period>
+        <domain:ns>
+          <domain:hostObj>ns1.example.net</domain:hostObj>
+          <domain:hostObj>ns2.example.net</domain:hostObj>
+        </domain:ns>
+        <domain:registrant>registrantID</domain:registrant>
+        <domain:contact type="admin">adminID</domain:contact>
+        <domain:contact type="tech">techID</domain:contact>
+      </domain:create>
+    </create>
+    <extension>
+      <secDNS:create
+          xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+        <secDNS:maxSigLife>604800</secDNS:maxSigLife>
+        <secDNS:dsData>
+          <secDNS:keyTag>12345</secDNS:keyTag>
+          <secDNS:alg>13</secDNS:alg>
+          <secDNS:digestType>2</secDNS:digestType>
+          <secDNS:digest>
+            BE74359954660069D5C632B56F120EE9F3A86764247C
+          </secDNS:digest>
+        </secDNS:dsData>
+      </secDNS:create>
+      <ttl:create xmlns:ttl="urn:ietf:params:xml:ns:epp:ttl-1.0">
+        <ttl:ttl for="NS">3600</ttl:ttl>
+      </ttl:create>
+    </extension>
+    <clTRID>clTRID-1234</clTRID>
+  </command>
+</epp>
+~~~~
+
+
+## Free Registry for ENUM and Domains (FRED)
+
+FRED is an open source registry software developed by CZ.NIC
+
+### Create domain example
+
+~~~~ xml
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <domain:create
+          xmlns:domain="http://www.nic.cz/xml/epp/domain-1.4">
+        <domain:name>example.cz</domain:name>
+        <domain:registrant>registrantID</domain:registrant>
+        <domain:admin>adminID</domain:admin>
+        <domain:nsset>nssetID</domain:nsset>
+        <domain:keyset>keysetID</domain:keyset>
+      </domain:create>
+    </create>
+    <clTRID>clTRID-1234</clTRID>
+  </command>
+</epp>
+~~~~
+
+### Create nsset example
+
+~~~~ xml
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <nsset:create
+          xmlns:nsset="http://www.nic.cz/xml/epp/nsset-1.2">
+        <nsset:id>nssetID</nsset:id>
+        <nsset:ns>
+          <nsset:name>ns1.example.cz</nsset:name>
+          <nsset:addr>192.0.2.1</nsset:addr>
+          <nsset:addr>192.0.2.2</nsset:addr>
+        </nsset:ns>
+        <nsset:ns>
+          <nsset:name>nameserver-example.cz</nsset:name>
+        </nsset:ns>
+        <nsset:tech>techID</nsset:tech>
+        <nsset:reportlevel>1</nsset:reportlevel>
+      </nsset:create>
+    </create>
+    <clTRID>clTRID-1234</clTRID>
+  </command>
+</epp>
+~~~~
+
+### Create keyset example
+
+~~~~ xml
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <keyset:create
+          xmlns:keyset="http://www.nic.cz/xml/epp/keyset-1.3">
+        <keyset:id>keysetID</keyset:id>
+        <keyset:dnskey>
+          <keyset:flags>257</keyset:flags>
+          <keyset:protocol>3</keyset:protocol>
+          <keyset:alg>5</keyset:alg>
+          <keyset:pubKey>AwEAAddt2AkL4RJ9Ao6LCWheg8</keyset:pubKey>
+        </keyset:dnskey>
+        <keyset:dnskey>
+          <keyset:flags>257</keyset:flags>
+          <keyset:protocol>3</keyset:protocol>
+          <keyset:alg>5</keyset:alg>
+          <keyset:pubKey>AwEAAddt2AkL4RJ9Ao6LCWheg9</keyset:pubKey>
+        </keyset:dnskey>
+        <keyset:tech>techID</keyset:tech>
+      </keyset:create>
+    </create>
+    <clTRID>clTRID-1234</clTRID>
+  </command>
+</epp>
+~~~~
+
+## Realtime Registry Interface (RRI)
+
+RRI is a proprietary protocol developed by DENIC
+
+### Create domain with name servers example
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<registry-request
+    xmlns="http://registry.denic.de/global/5.0"
+    xmlns:domain="http://registry.denic.de/domain/5.0"
+    xmlns:dnsentry="http://registry.denic.de/dnsentry/5.0">
+  <domain:create>
+    <domain:handle>example.de</domain:handle>
+    <domain:contact role="holder">registrantID</domain:contact>
+    <dnsentry:dnsentry xsi:type="dnsentry:NS">
+      <dnsentry:owner>example.de</dnsentry:owner>
+      <dnsentry:rdata>
+        <dnsentry:nameserver>ns1.example.com</dnsentry:nameserver>
+      </dnsentry:rdata>
+    </dnsentry:dnsentry>
+    <dnsentry:dnsentry xsi:type="dnsentry:NS">
+      <dnsentry:owner>example.de</dnsentry:owner>
+      <dnsentry:rdata>
+        <dnsentry:nameserver>ns1.example.de</dnsentry:nameserver>
+        <dnsentry:address>192.0.2.1</dnsentry:address>
+      </dnsentry:rdata>
+    </dnsentry:dnsentry>
+    <dnsentry:dnsentry xsi:type="dnsentry:DNSKEY">
+      <dnsentry:owner>example.de.</dnsentry:owner>
+      <dnsentry:rdata>
+        <dnsentry:flags>257</dnsentry:flags>
+        <dnsentry:protocol>3</dnsentry:protocol>
+        <dnsentry:algorithm>5</dnsentry:algorithm>
+        <dnsentry:publicKey>
+          AwEAAddt2AkL4RJ9Ao6LCWheg8
+        </dnsentry:publicKey>
+      </dnsentry:rdata>
+    </dnsentry:dnsentry>
+  </domain:create>
+  <ctid>clTRID-1234</ctid>
+</registry-request>
+~~~~
+
+### Create domain without delegation example
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<registry-request
+    xmlns="http://registry.denic.de/global/5.0"
+    xmlns:domain="http://registry.denic.de/domain/5.0"
+    xmlns:dnsentry="http://registry.denic.de/dnsentry/5.0">
+  <domain:update>
+    <domain:handle>example.de</domain:handle>
+    <domain:contact role="holder">registrantID</domain:contact>
+    <dnsentry:dnsentry xsi:type="dnsentry:A">
+      <dnsentry:owner>example.de</dnsentry:owner>
+      <dnsentry:rdata>
+        <dnsentry:address>192.0.2.1</dnsentry:address>
+      </dnsentry:rdata>
+    </dnsentry:dnsentry>
+  </domain:update>
+  <ctid>clTRID-1234</ctid>
+</registry-request>
+~~~~
+
+## RDAP
+
+Registration Data Access Protocol (RDAP) is described in {{RFC7483}}. An extention proposing Time-to-Live (TTL) values is described in
+{{I-D.draft-brown-rdap-ttl-extension}} and is close to adoption in the regext working group.
+
+~~~~ json
+{
+  "objectClassName": "domain",
+  "ldhName": "example.com",
+  "nameservers": [
+    {
+      "objectClassName": "nameserver",
+      "ldhName": "ns1.example.com",
+      "ipAddresses": {
+        "v4": ["192.0.2.1"],
+        "v6": ["2001:db8::1"]
+      }
+    },
+    {
+      "objectClassName": "nameserver",
+      "ldhName": "ns2.example.com",
+      "ipAddresses": {
+        "v4": ["192.0.2.2"]
+      }
+    }
+  ],
+  "secureDNS": {
+    "delegationSigned": true,
+    "maxSigLife": 604800,
+    "dsData": [
+      {
+        "keyTag": 12345,
+        "algorithm": 13,
+        "digestType": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+      }
+    ]
+  },
+  "ttl": [
+       {
+         "types": [ "NS" ],
+         "value": 3600
+       }
+  ],
+  "events": [
+    {
+      "eventAction": "registration",
+      "eventDate": "2025-01-01T00:00:00Z"
+    },
+    {
+      "eventAction": "expiration",
+      "eventDate": "2035-01-01T00:00:00Z"
+    }
+  ],
+  "status": ["active"]
+}
+~~~~
 
 --- back
 
