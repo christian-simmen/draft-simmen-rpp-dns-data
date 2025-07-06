@@ -4,8 +4,8 @@
 
 rpp                                                            C. Simmen
 Internet-Draft                                                  DENIC eG
-Intended status: Informational                               5 July 2025
-Expires: 6 January 2026
+Intended status: Informational                               7 July 2025
+Expires: 8 January 2026
 
 
  DNS data representation for use in RESTful Provisioning Protocol (RPP)
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 1]
+Simmen                   Expires 8 January 2026                 [Page 1]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -63,7 +63,7 @@ Internet-Draft         RPP DNS data representation             July 2025
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 January 2026.
+   This Internet-Draft will expire on 8 January 2026.
 
 Copyright Notice
 
@@ -96,34 +96,35 @@ Table of Contents
        3.2.4.  Authoritative DNS data  . . . . . . . . . . . . . . .  14
    4.  Discoverability of supported RR types and operational
            controls  . . . . . . . . . . . . . . . . . . . . . . . .  16
-   5.  Conventions and Definitions . . . . . . . . . . . . . . . . .  16
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
-     6.1.  Authoritative data  . . . . . . . . . . . . . . . . . . .  16
-     6.2.  Host references within the rdata field  . . . . . . . . .  17
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
-   8.  Appendix A.  Examples from current implementations  . . . . .  17
-     8.1.  EPP . . . . . . . . . . . . . . . . . . . . . . . . . . .  17
-       8.1.1.  Create domain using host attributes example . . . . .  17
-       8.1.2.  ### Create domain using host object example . . . . .  18
-     8.2.  Free Registry for ENUM and Domains (FRED) . . . . . . . .  19
+   5.  EPP compatibility considerations  . . . . . . . . . . . . . .  16
+   6.  Conventions and Definitions . . . . . . . . . . . . . . . . .  16
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
+     7.1.  Authoritative data  . . . . . . . . . . . . . . . . . . .  16
+     7.2.  Host references within the rdata field  . . . . . . . . .  17
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+   9.  Appendix A.  Examples from current implementations  . . . . .  17
+     9.1.  EPP . . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+       9.1.1.  Create domain using host attributes example . . . . .  17
+       9.1.2.  Create domain using host object example . . . . . . .  18
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 2]
+Simmen                   Expires 8 January 2026                 [Page 2]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
 
-       8.2.1.  Create domain example . . . . . . . . . . . . . . . .  19
-       8.2.2.  Create nsset example  . . . . . . . . . . . . . . . .  20
-       8.2.3.  Create keyset example . . . . . . . . . . . . . . . .  20
-     8.3.  Realtime Registry Interface (RRI) . . . . . . . . . . . .  21
-       8.3.1.  Create domain with name servers example . . . . . . .  21
-       8.3.2.  Create domain without delegation example  . . . . . .  22
-     8.4.  RDAP  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  24
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  25
+     9.2.  Free Registry for ENUM and Domains (FRED) . . . . . . . .  19
+       9.2.1.  Create domain example . . . . . . . . . . . . . . . .  19
+       9.2.2.  Create nsset example  . . . . . . . . . . . . . . . .  20
+       9.2.3.  Create keyset example . . . . . . . . . . . . . . . .  20
+     9.3.  Realtime Registry Interface (RRI) . . . . . . . . . . . .  21
+       9.3.1.  Create domain with name servers example . . . . . . .  21
+       9.3.2.  Create domain without delegation example  . . . . . .  22
+     9.4.  RDAP  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  24
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  25
    Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  26
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  26
 
@@ -164,8 +165,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-
-Simmen                   Expires 6 January 2026                 [Page 3]
+Simmen                   Expires 8 January 2026                 [Page 3]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -221,7 +221,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 4]
+Simmen                   Expires 8 January 2026                 [Page 4]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -277,7 +277,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 5]
+Simmen                   Expires 8 January 2026                 [Page 5]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -333,7 +333,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 6]
+Simmen                   Expires 8 January 2026                 [Page 6]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -389,7 +389,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 7]
+Simmen                   Expires 8 January 2026                 [Page 7]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -418,8 +418,11 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 3.1.4.  Future DNS record types
 
-   Future record types SHOULD be added by breaking down the RDATA field
-   specified by the RFC of the corresponding DNS record type.
+   With respect to an evolving DNS landscape new record types -
+   including delegation - may emerge.  Usually these record type will be
+   defined and standardized for the DNS in first.  Adopting future
+   record types MUST be done using the rules described in section
+   3.1.2.6 of this document.
 
 3.2.  Use cases
 
@@ -442,10 +445,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-
-
-
-Simmen                   Expires 6 January 2026                 [Page 8]
+Simmen                   Expires 8 January 2026                 [Page 8]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -501,7 +501,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                 [Page 9]
+Simmen                   Expires 8 January 2026                 [Page 9]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -557,7 +557,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 10]
+Simmen                   Expires 8 January 2026                [Page 10]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -613,7 +613,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 11]
+Simmen                   Expires 8 January 2026                [Page 11]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -669,7 +669,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 12]
+Simmen                   Expires 8 January 2026                [Page 12]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -725,7 +725,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 13]
+Simmen                   Expires 8 January 2026                [Page 13]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -781,7 +781,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 14]
+Simmen                   Expires 8 January 2026                [Page 14]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -837,7 +837,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 15]
+Simmen                   Expires 8 January 2026                [Page 15]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -860,11 +860,19 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 4.  Discoverability of supported RR types and operational controls
 
-   The server MUST provide a structured document to the client which
-   provides * a list of supported record types * a list of applicable
-   dns_controls * minimum, maximum and default values for dns_controls
+   The server MUST provide the following information per profile in the
+   discovery document in section 10 of
+   [I-D.draft-ietf-rpp-requirements]: * a list of supported record types
+   * a list of applicable dns_controls * minimum, maximum and default
+   values for dns_controls
 
-5.  Conventions and Definitions
+   TODO: Needs rewrite after definition of the discovery document
+
+5.  EPP compatibility considerations
+
+   TODO
+
+6.  Conventions and Definitions
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -872,9 +880,9 @@ Internet-Draft         RPP DNS data representation             July 2025
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-6.  Security Considerations
+7.  Security Considerations
 
-6.1.  Authoritative data
+7.1.  Authoritative data
 
    Allowing to store authoritative resource records (see section 3.2.4)
    in the registry provides faster resolution.  However, if not done
@@ -882,23 +890,21 @@ Internet-Draft         RPP DNS data representation             July 2025
    should have been delegated.  RPP servers MUST take precautions to not
    store authoritative and non-authoritative data at the same time.
 
+
+
+
+Simmen                   Expires 8 January 2026                [Page 16]
+
+Internet-Draft         RPP DNS data representation             July 2025
+
+
    The types and number of authoritative records can result in
    uncontrolled growth of the registries zone file and eventually
    exhaust the hardware resources of the registries name server.  RPP
    servers SHOULD consider limiting the amount of authoritative records
    and carefully choose which record types are allowed.
 
-
-
-
-
-
-Simmen                   Expires 6 January 2026                [Page 16]
-
-Internet-Draft         RPP DNS data representation             July 2025
-
-
-6.2.  Host references within the rdata field
+7.2.  Host references within the rdata field
 
    Some RR types (NS, MX and others) use references to host names which
    can be categorized into three categories:
@@ -918,17 +924,15 @@ Internet-Draft         RPP DNS data representation             July 2025
    Deletion of a host name while still being referenced may lead to
    severe security risks for the referencing domain.
 
-7.  IANA Considerations
+8.  IANA Considerations
 
    This document has no IANA actions.
 
-8.  Appendix A.  Examples from current implementations
+9.  Appendix A.  Examples from current implementations
 
-8.1.  EPP
+9.1.  EPP
 
-8.1.1.  Create domain using host attributes example
-
-
+9.1.1.  Create domain using host attributes example
 
 
 
@@ -945,11 +949,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-
-
-
-
-Simmen                   Expires 6 January 2026                [Page 17]
+Simmen                   Expires 8 January 2026                [Page 17]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -999,13 +999,13 @@ Internet-Draft         RPP DNS data representation             July 2025
      </command>
    </epp>
 
-8.1.2.  ### Create domain using host object example
+9.1.2.  Create domain using host object example
 
 
 
 
 
-Simmen                   Expires 6 January 2026                [Page 18]
+Simmen                   Expires 8 January 2026                [Page 18]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1048,11 +1048,11 @@ Internet-Draft         RPP DNS data representation             July 2025
      </command>
    </epp>
 
-8.2.  Free Registry for ENUM and Domains (FRED)
+9.2.  Free Registry for ENUM and Domains (FRED)
 
    FRED is an open source registry software developed by CZ.NIC
 
-8.2.1.  Create domain example
+9.2.1.  Create domain example
 
 
 
@@ -1061,7 +1061,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 19]
+Simmen                   Expires 8 January 2026                [Page 19]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1083,7 +1083,7 @@ Internet-Draft         RPP DNS data representation             July 2025
      </command>
    </epp>
 
-8.2.2.  Create nsset example
+9.2.2.  Create nsset example
 
    <?xml version="1.0" encoding="utf-8" standalone="no"?>
    <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -1108,7 +1108,7 @@ Internet-Draft         RPP DNS data representation             July 2025
      </command>
    </epp>
 
-8.2.3.  Create keyset example
+9.2.3.  Create keyset example
 
 
 
@@ -1117,7 +1117,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 20]
+Simmen                   Expires 8 January 2026                [Page 20]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1148,11 +1148,11 @@ Internet-Draft         RPP DNS data representation             July 2025
      </command>
    </epp>
 
-8.3.  Realtime Registry Interface (RRI)
+9.3.  Realtime Registry Interface (RRI)
 
    RRI is a proprietary protocol developed by DENIC
 
-8.3.1.  Create domain with name servers example
+9.3.1.  Create domain with name servers example
 
 
 
@@ -1173,7 +1173,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 21]
+Simmen                   Expires 8 January 2026                [Page 21]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1214,7 +1214,7 @@ Internet-Draft         RPP DNS data representation             July 2025
      <ctid>clTRID-1234</ctid>
    </registry-request>
 
-8.3.2.  Create domain without delegation example
+9.3.2.  Create domain without delegation example
 
 
 
@@ -1229,7 +1229,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 22]
+Simmen                   Expires 8 January 2026                [Page 22]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1252,7 +1252,7 @@ Internet-Draft         RPP DNS data representation             July 2025
      <ctid>clTRID-1234</ctid>
    </registry-request>
 
-8.4.  RDAP
+9.4.  RDAP
 
    Registration Data Access Protocol (RDAP) is described in [RFC9083].
    An extention proposing Time-to-Live (TTL) values is described in
@@ -1285,7 +1285,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 23]
+Simmen                   Expires 8 January 2026                [Page 23]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1318,9 +1318,9 @@ Internet-Draft         RPP DNS data representation             July 2025
      "status": ["active"]
    }
 
-9.  References
+10.  References
 
-9.1.  Normative References
+10.1.  Normative References
 
    [RFC1035]  Mockapetris, P., "Domain names - implementation and
               specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
@@ -1341,7 +1341,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 24]
+Simmen                   Expires 8 January 2026                [Page 24]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1380,7 +1380,7 @@ Internet-Draft         RPP DNS data representation             July 2025
               DOI 10.17487/RFC9803, June 2025,
               <https://www.rfc-editor.org/rfc/rfc9803>.
 
-9.2.  Informative References
+10.2.  Informative References
 
    [I-D.draft-brown-rdap-ttl-extension]
               Brown, G., "RDAP Extension for DNS Time-To-Live (TTL
@@ -1397,7 +1397,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen                   Expires 6 January 2026                [Page 25]
+Simmen                   Expires 8 January 2026                [Page 25]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1408,6 +1408,13 @@ Internet-Draft         RPP DNS data representation             July 2025
               Internet-Draft, draft-ietf-deleg-00, 6 May 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-deleg-
               00>.
+
+   [I-D.draft-ietf-rpp-requirements]
+              Wullink, M. and P. Kowalik, "RESTful Provisioning Protocol
+              (RPP) - Requirements", Work in Progress, Internet-Draft,
+              draft-ietf-rpp-requirements-01, 30 June 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-rpp-
+              requirements-01>.
 
    [RFC8484]  Hoffman, P. and P. McManus, "DNS Queries over HTTPS
               (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
@@ -1446,11 +1453,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-Simmen                   Expires 6 January 2026                [Page 26]
+Simmen                   Expires 8 January 2026                [Page 26]

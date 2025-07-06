@@ -551,7 +551,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 
 # Discoverability of supported RR types and operational controls
 
-The server MUST provide the following information per profile in the discovery document in section 10 of {{draft-ietf-rpp-requirements}}:
+The server MUST provide the following information per profile in the discovery document in section 10 of {{I-D.draft-ietf-rpp-requirements}}:
 * a list of supported record types
 * a list of applicable dns_controls
 * minimum, maximum and default values for dns_controls
