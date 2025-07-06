@@ -68,7 +68,7 @@ informative:
   RFC9250:
   RFC9499:
   I-D.draft-ietf-deleg:
-  #I-D.draft-wullink-rpp-requirements:
+  I-D.draft-ietf-rpp-requirements:
   #I-D.draft-ietf-regext-epp-delete-bcp:
   #I-D.draft-kowalik-rpp-architecture:
   I-D.draft-brown-rdap-ttl-extension:
@@ -551,10 +551,12 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 
 # Discoverability of supported RR types and operational controls
 
-The server MUST provide a structured document to the client which provides
+The server MUST provide the following information per profile in the discovery document in section 10 of {{draft-ietf-rpp-requirements}}:
 * a list of supported record types
 * a list of applicable dns_controls
 * minimum, maximum and default values for dns_controls
+
+TODO: Needs rewrite after definition of the discovery document
 
 # Conventions and Definitions
 
