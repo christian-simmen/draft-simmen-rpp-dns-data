@@ -26,7 +26,7 @@ category: info
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-07-05
+date: 2025-07-07
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -258,7 +258,7 @@ A client MAY add an JSON object with a number of "dns_controls" to the domain ob
 
 ### Future DNS record types
 
-Future record types SHOULD be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.
+With respect to an evolving DNS landscape new record types - including delegation - may emerge. Usually these record type will be defined and standardized for the DNS in first. Adopting future record types MUST be done using the rules described in section 3.1.2.6 of this document.
 
 ## Use cases
 
