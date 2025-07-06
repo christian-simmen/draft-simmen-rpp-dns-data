@@ -558,6 +558,10 @@ The server MUST provide the following information per profile in the discovery d
 
 TODO: Needs rewrite after definition of the discovery document
 
+# EPP compatibility considerations
+
+TODO
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
