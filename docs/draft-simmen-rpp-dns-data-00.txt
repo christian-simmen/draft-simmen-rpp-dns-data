@@ -162,7 +162,6 @@ Internet-Draft         RPP DNS data representation             July 2025
    specified in a format that directly mirrors DNS resource records.
    This approach is not intended to influence existing registry data
    models, but rather to offer a flexible and consistent structure for
-   the data in the protocol.  By unifying the representation of
 
 
 
@@ -171,6 +170,7 @@ Simmen & Kowalik         Expires 8 January 2026                 [Page 3]
 Internet-Draft         RPP DNS data representation             July 2025
 
 
+   the data in the protocol.  By unifying the representation of
    delegation data (NS, A/AAAA glue), DNSSEC information, and other
    record types, this model can be applied across various contexts.  It
    is designed to be equally applicable whether a registry uses separate
@@ -218,7 +218,6 @@ Internet-Draft         RPP DNS data representation             July 2025
    this array MUST be a representation of the top level format as
    described in section 3.2.1 of [RFC1035].  All keys MUST be lowercase.
    Whitespaces MUST be translated to underscores ("_").
-
 
 
 
