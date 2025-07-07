@@ -26,7 +26,7 @@ category: info
 docname: draft-simmen-rpp-dns-data-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-07-05
+date: 2025-07-07
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -68,7 +68,7 @@ informative:
   RFC9250:
   RFC9499:
   I-D.draft-ietf-deleg:
-  #I-D.draft-wullink-rpp-requirements:
+  I-D.draft-ietf-rpp-requirements:
   #I-D.draft-ietf-regext-epp-delete-bcp:
   #I-D.draft-kowalik-rpp-architecture:
   I-D.draft-brown-rdap-ttl-extension:
@@ -191,11 +191,11 @@ If present the value MUST be chosen from section 3.2.4. CLASS values of {{RFC103
 #### type
 
 The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
-If present the value MUST chosen from section 3.2.2. TYPE values, converted to lower case, of {{RFC1035}} or other RFC describing the RR TYPE.
+If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} or other RFC describing the RR type. Valuse MUST be converted to lower case.
 
 #### ttl
 
-TTL is considered a operational control (see section 3.1.3 Operational controls and section 3.2.3.1 TTL). A server MUST set a default value as TTL and MAY ignore other values send by a client.
+TTL is considered a operational control (see section 3.1.3 Operational controls and section 4.3.1 TTL). A server MUST set a default value as TTL and MAY ignore other values send by a client.
 
 #### rdlength
 
@@ -258,11 +258,11 @@ A client MAY add an JSON object with a number of "dns_controls" to the domain ob
 
 ### Future DNS record types
 
-Future record types SHOULD be added by breaking down the RDATA field specified by the RFC of the corresponding DNS record type.
+With respect to an evolving DNS landscape new record types - including delegation - may emerge. Usually these record type will be defined and standardized for the DNS in first. Adopting future record types MUST be done using the rules described in section 3.1.2.6 of this document.
 
-## Use cases
+# Use cases
 
-### Domain delegation
+## Domain delegation
 
 To enable domain delegation a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}},{{RFC3596}}).
 
@@ -328,7 +328,7 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
     }
 ~~~~
 
-### DNSSEC
+## DNSSEC
 
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
@@ -396,9 +396,9 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
     }
 ~~~~
 
-### Setting operational controls
+## Operational controls
 
-#### TTL
+### TTL
 
 The TTL controls the caching behavior of DNS resource records (see Section 5 of {{RFC9499}}). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.
 
@@ -434,7 +434,7 @@ Example:
     }
 ~~~~
 
-#### Maximum signature lifetime
+### Maximum signature lifetime
 
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
 
@@ -479,7 +479,7 @@ Example:
     }
 ~~~~
 
-### Authoritative DNS data
+## Authoritative DNS data
 
 A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
 
@@ -549,12 +549,18 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 }
 ~~~~
 
-# Discoverability of supported RR types and operational controls
+# Discoverability
 
-The server MUST provide a structured document to the client which provides
-* a list of supported record types
+The server MUST provide the following information per profile in the discovery document in section 10 of {{I-D.draft-ietf-rpp-requirements}}:
+* a list of supported resource record types
 * a list of applicable dns_controls
 * minimum, maximum and default values for dns_controls
+
+TODO: Needs rewrite after definition of the discovery document
+
+# EPP compatibility considerations
+
+TODO
 
 # Conventions and Definitions
 
@@ -565,7 +571,7 @@ The server MUST provide a structured document to the client which provides
 
 ## Authoritative data
 
-Allowing to store authoritative resource records (see section 3.2.4) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers MUST take precautions to not store authoritative and non-authoritative data at the same time.
+Allowing to store authoritative resource records (see section 4.4) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers MUST take precautions to not store authoritative and non-authoritative data at the same time.
 
 The types and number of authoritative records can result in uncontrolled growth of the registries zone file and eventually exhaust the hardware resources of the registries name server. RPP servers SHOULD consider limiting the amount of authoritative records and carefully choose which record types are allowed.
 
@@ -642,7 +648,7 @@ This document has no IANA actions.
 </epp>
 ~~~~
 
-### ### Create domain using host object example
+### Create domain using host object example
 
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -834,6 +840,8 @@ RRI is a proprietary protocol developed by DENIC
 ~~~~
 
 ## RDAP
+
+### Domain object
 
 Registration Data Access Protocol (RDAP) is described in {{RFC9083}}. An extention proposing Time-to-Live (TTL) values is described in
 {{I-D.draft-brown-rdap-ttl-extension}} and is close to adoption in the regext working group.
