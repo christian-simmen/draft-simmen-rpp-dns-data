@@ -6,6 +6,7 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>DNS data representation for use in RESTful Provisioning Protocol (RPP)</title>
 <meta content="Christian Simmen" name="author">
+<meta content="Pawel Kowalik" name="author">
 <meta content="
        This document proposes a unified, extensible JSON representation for DNS resource records for use in the RESTful Provisioning Protocol (RPP). The aim is to create a single, consistent structure for provisioning all DNS-related data - including delegation, DNSSEC, and other record types - that directly mirrors the DNS data model and being mappable to existing EPP model of requests and responses same time. This approach simplifies the adoption of both current and future DNS features by aligning the provisioning format with the target system, thereby streamlining the management of domain names and related objects within RPP. 
     " name="description">
@@ -1218,7 +1219,7 @@ li > p:last-of-type:only-child {
 <td class="right">July 2025</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Simmen</td>
+<td class="left">Simmen &amp; Kowalik</td>
 <td class="center">Expires 8 January 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1238,10 +1239,14 @@ li > p:last-of-type:only-child {
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
 <dd class="expires"><time datetime="2026-01-08">8 January 2026</time></dd>
-<dt class="label-authors">Author:</dt>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">C. Simmen</div>
+<div class="org">DENIC eG</div>
+</div>
+<div class="author">
+      <div class="author-name">P. Kowalik</div>
 <div class="org">DENIC eG</div>
 </div>
 </dd>
@@ -1348,24 +1353,27 @@ li > p:last-of-type:only-child {
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-use-cases" class="internal xref">Use cases</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-domain-delegation" class="internal xref">Domain delegation</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-domain-delegation-host-attr" class="internal xref">Domain delegation (Host Attribute)</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-dnssec" class="internal xref">DNSSEC</a></p>
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-host-object" class="internal xref">Host Object</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-operational-controls-2" class="internal xref">Operational controls</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.1">
-                    <p id="section-toc.1-1.4.2.3.2.1.1"><a href="#section-4.3.1" class="auto internal xref">4.3.1</a>.  <a href="#name-ttl-2" class="internal xref">TTL</a></p>
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-dnssec" class="internal xref">DNSSEC</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.2">
-                    <p id="section-toc.1-1.4.2.3.2.2.1"><a href="#section-4.3.2" class="auto internal xref">4.3.2</a>.  <a href="#name-maximum-signature-lifetime" class="internal xref">Maximum signature lifetime</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-operational-controls-2" class="internal xref">Operational controls</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.1">
+                    <p id="section-toc.1-1.4.2.4.2.1.1"><a href="#section-4.4.1" class="auto internal xref">4.4.1</a>.  <a href="#name-ttl-2" class="internal xref">TTL</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.2">
+                    <p id="section-toc.1-1.4.2.4.2.2.1"><a href="#section-4.4.2" class="auto internal xref">4.4.2</a>.  <a href="#name-maximum-signature-lifetime" class="internal xref">Maximum signature lifetime</a></p>
 </li>
                 </ul>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-authoritative-dns-data" class="internal xref">Authoritative DNS data</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-authoritative-dns-data" class="internal xref">Authoritative DNS data</a></p>
 </li>
             </ul>
 </li>
@@ -1456,7 +1464,7 @@ li > p:last-of-type:only-child {
             <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1508,7 +1516,8 @@ li > p:last-of-type:only-child {
 <div class="lang-json sourcecode" id="section-3.1.1-2">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "",
@@ -1542,7 +1551,8 @@ li > p:last-of-type:only-child {
 <div class="lang-json sourcecode" id="section-3.1.2.1-7">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1622,7 +1632,8 @@ The resulting structure is therefore:<a href="#section-3.1.2.6-2" class="pilcrow
 <div class="lang-json sourcecode" id="section-3.1.2.6-3">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1657,7 +1668,8 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
 <div class="lang-json sourcecode" id="section-3.1.3-2">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "&lt;name&gt;",
@@ -1692,17 +1704,19 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
       <h2 id="name-use-cases">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-use-cases" class="section-name selfRef">Use cases</a>
       </h2>
-<div id="domain-delegation">
+<div id="domain-delegation-host-attribute">
 <section id="section-4.1">
-        <h3 id="name-domain-delegation">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-domain-delegation" class="section-name selfRef">Domain delegation</a>
+        <h3 id="name-domain-delegation-host-attr">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-domain-delegation-host-attr" class="section-name selfRef">Domain delegation (Host Attribute)</a>
         </h3>
-<p id="section-4.1-1">To enable domain delegation a server <span class="bcp14">MUST</span> support the "NS", "A" and "AAAA" record types (<span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>,<span>[<a href="#RFC3596" class="cite xref">RFC3596</a>]</span>).<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.1-3">
+<p id="section-4.1-1">To enable domain delegation a server <span class="bcp14">MUST</span> support the "NS", "A" and "AAAA" record types (<span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>, <span>[<a href="#RFC3596" class="cite xref">RFC3596</a>]</span>).<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">In this delegation model the delegation information and corresponding DNS configuration is attached directly to a domain object. This is corresponding to Host Attribute delegation model of <span>[<a href="#RFC5731" class="cite xref">RFC5731</a>]</span>.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.1-4">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1720,13 +1734,14 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
         }
       ]
     }
-</pre><a href="#section-4.1-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-4.1-4">If GLUE records are needed the client may add records of type "A" or "AAAA" :<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.1-5">
+<p id="section-4.1-5">If GLUE records are needed the client may add records of type "A" or "AAAA" :<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.1-6">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1758,20 +1773,62 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
         }
       ]
     }
-</pre><a href="#section-4.1-5" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-6" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="host-object">
+<section id="section-4.2">
+        <h3 id="name-host-object">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-host-object" class="section-name selfRef">Host Object</a>
+        </h3>
+<p id="section-4.2-1"><span>[<a href="#RFC5731" class="cite xref">RFC5731</a>]</span> specifies how domain delegation can be expressed as a relation to a separate provisioning object (Host Object), which carries the DNS configuration (name and glue records), with details specified in <span>[<a href="#RFC5732" class="cite xref">RFC5732</a>]</span>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">To enable specification of Host Objexts, similar to direct domain delegation, a server <span class="bcp14">MUST</span> support the "NS", "A" and "AAAA" record types (<span>[<a href="#RFC1035" class="cite xref">RFC1035</a>]</span>, <span>[<a href="#RFC3596" class="cite xref">RFC3596</a>]</span>).<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">DNS configuration of Host Object is specified by NS, A and AAAA configuration within "dns" data structure:<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.2-4">
+<pre>
+    {
+      "@type": "Host",
+      "name": "ns.example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "ns",
+          "rdata": {
+            "nsdname": "ns.example.com"
+          }
+        },
+        {
+          "name": "ns.example.com.",
+          "type": "a",
+          "rdata": {
+            "address": "192.0.2.1"
+          }
+        },
+        {
+          "name": "ns.example.com.",
+          "type": "aaaa",
+          "rdata": {
+            "address": "2001:DB8::1"
+          }
+        }
+      ]
+    }
+</pre><a href="#section-4.2-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="dnssec">
-<section id="section-4.2">
+<section id="section-4.3">
         <h3 id="name-dnssec">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-dnssec" class="section-name selfRef">DNSSEC</a>
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-dnssec" class="section-name selfRef">DNSSEC</a>
         </h3>
-<p id="section-4.2-1">To enable DNSSEC provisioning a server <span class="bcp14">SHOULD</span> support either "DS" or "DNSKEY" or both record types. The records <span class="bcp14">MUST</span> be added to the "dns" array of the domain. If provided with only "DNSKEY" a server <span class="bcp14">MUST</span> calculate the DS record. If both record types are provided a server <span class="bcp14">MAY</span> use the DNSKEY to validate the DS record.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.2-2">
+<p id="section-4.3-1">To enable DNSSEC provisioning a server <span class="bcp14">SHOULD</span> support either "DS" or "DNSKEY" or both record types. The records <span class="bcp14">MUST</span> be added to the "dns" array of the domain. If provided with only "DNSKEY" a server <span class="bcp14">MUST</span> calculate the DS record. If both record types are provided a server <span class="bcp14">MAY</span> use the DNSKEY to validate the DS record.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.3-2">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1799,12 +1856,13 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
         }
       ]
     }
-</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
 </div>
-<div class="lang-json sourcecode" id="section-4.2-3">
+<div class="lang-json sourcecode" id="section-4.3-3">
 <pre>
     {
-      "domain": "example.com.",
+      "@type": "Domain",
+      "name": "example.com.",
       "dns": [
         {
           "name": "@",
@@ -1832,27 +1890,28 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
         }
       ]
     }
-</pre><a href="#section-4.2-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.3-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="operational-controls-1">
-<section id="section-4.3">
+<section id="section-4.4">
         <h3 id="name-operational-controls-2">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-operational-controls-2" class="section-name selfRef">Operational controls</a>
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-operational-controls-2" class="section-name selfRef">Operational controls</a>
         </h3>
 <div id="ttl-1">
-<section id="section-4.3.1">
+<section id="section-4.4.1">
           <h4 id="name-ttl-2">
-<a href="#section-4.3.1" class="section-number selfRef">4.3.1. </a><a href="#name-ttl-2" class="section-name selfRef">TTL</a>
+<a href="#section-4.4.1" class="section-number selfRef">4.4.1. </a><a href="#name-ttl-2" class="section-name selfRef">TTL</a>
           </h4>
-<p id="section-4.3.1-1">The TTL controls the caching behavior of DNS resource records (see Section 5 of <span>[<a href="#RFC9499" class="cite xref">RFC9499</a>]</span>). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.<a href="#section-4.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.3.1-2">A client <span class="bcp14">MAY</span> assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <span class="bcp14">MAY</span> ignore these values, e.g. for policy reasons.<a href="#section-4.3.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.3.1-3">Example:<a href="#section-4.3.1-3" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.3.1-4">
+<p id="section-4.4.1-1">The TTL controls the caching behavior of DNS resource records (see Section 5 of <span>[<a href="#RFC9499" class="cite xref">RFC9499</a>]</span>). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.<a href="#section-4.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-2">A client <span class="bcp14">MAY</span> assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <span class="bcp14">MAY</span> ignore these values, e.g. for policy reasons.<a href="#section-4.4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-3">Example:<a href="#section-4.4.1-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.4.1-4">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1876,22 +1935,23 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
        }
       }
     }
-</pre><a href="#section-4.3.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.1-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="maximum-signature-lifetime">
-<section id="section-4.3.2">
+<section id="section-4.4.2">
           <h4 id="name-maximum-signature-lifetime">
-<a href="#section-4.3.2" class="section-number selfRef">4.3.2. </a><a href="#name-maximum-signature-lifetime" class="section-name selfRef">Maximum signature lifetime</a>
+<a href="#section-4.4.2" class="section-number selfRef">4.4.2. </a><a href="#name-maximum-signature-lifetime" class="section-name selfRef">Maximum signature lifetime</a>
           </h4>
-<p id="section-4.3.2-1">Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of <span>[<a href="#RFC4034" class="cite xref">RFC4034</a>]</span> for information on the RRSIG resource record (RR).<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.3.2-2">A client <span class="bcp14">MAY</span> assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <span class="bcp14">MAY</span> ignore these values, e.g. for policy reasons.<a href="#section-4.3.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.3.2-3">Example:<a href="#section-4.3.2-3" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.3.2-4">
+<p id="section-4.4.2-1">Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of <span>[<a href="#RFC4034" class="cite xref">RFC4034</a>]</span> for information on the RRSIG resource record (RR).<a href="#section-4.4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.2-2">A client <span class="bcp14">MAY</span> assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <span class="bcp14">MAY</span> ignore these values, e.g. for policy reasons.<a href="#section-4.4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.2-3">Example:<a href="#section-4.4.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.4.2-4">
 <pre>
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -1924,22 +1984,23 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
         }
       }
     }
-</pre><a href="#section-4.3.2-4" class="pilcrow">¶</a>
+</pre><a href="#section-4.4.2-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 </section>
 </div>
 <div id="authoritative-dns-data">
-<section id="section-4.4">
+<section id="section-4.5">
         <h3 id="name-authoritative-dns-data">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-authoritative-dns-data" class="section-name selfRef">Authoritative DNS data</a>
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-authoritative-dns-data" class="section-name selfRef">Authoritative DNS data</a>
         </h3>
-<p id="section-4.4-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server <span class="bcp14">MUST</span> consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<div class="breakable lang-json sourcecode" id="section-4.4-2">
+<p id="section-4.5-1">A server <span class="bcp14">MAY</span> support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server <span class="bcp14">MUST</span> consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<div class="breakable lang-json sourcecode" id="section-4.5-2">
 <pre>
 {
-  "domain": "example.com",
+  "@type": "Domain",
+  "name": "example.com",
   "dns": [
     {
       "name": "@",
@@ -2001,7 +2062,7 @@ A client <span class="bcp14">MAY</span> add an JSON object with a number of "dns
     }
   ]
 }
-</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.5-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2092,7 +2153,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-domain-using-host-at">
 <a href="#section-10.1.1" class="section-number selfRef">10.1.1. </a><a href="#name-create-domain-using-host-at" class="section-name selfRef">Create domain using host attributes example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.1.1-1">
+<p id="section-10.1.1-1">EPP XML:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.1.1-2">
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;epp xmlns="urn:ietf:params:xml:ns:epp-1.0"&gt;
@@ -2138,7 +2200,7 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
     &lt;clTRID&gt;clTRID-1234&lt;/clTRID&gt;
   &lt;/command&gt;
 &lt;/epp&gt;
-</pre><a href="#section-10.1.1-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.1.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2147,7 +2209,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-domain-using-host-ob">
 <a href="#section-10.1.2" class="section-number selfRef">10.1.2. </a><a href="#name-create-domain-using-host-ob" class="section-name selfRef">Create domain using host object example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.1.2-1">
+<p id="section-10.1.2-1">EPP XML:<a href="#section-10.1.2-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.1.2-2">
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;epp xmlns="urn:ietf:params:xml:ns:epp-1.0"&gt;
@@ -2186,7 +2249,51 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
     &lt;clTRID&gt;clTRID-1234&lt;/clTRID&gt;
   &lt;/command&gt;
 &lt;/epp&gt;
-</pre><a href="#section-10.1.2-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.1.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-10.1.2-3">RPP JSON representation:<a href="#section-10.1.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-10.1.2-4">
+<pre>
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "...": "",
+  "_object_references": {
+    "nameserver": [
+      {
+        "name": "ns1.example.net.",
+        "href": "https://rpp.example/nameservers/ns1.example.net",
+        "rel": "nameserver"
+      },
+      {
+        "name": "ns2.example.net.",
+        "href": "https://rpp.example/nameservers/ns2.example.net",
+        "rel": "nameserver"
+      }
+    ]
+  },
+  "dns": [
+    {
+      "name": "@",
+      "type": "ds",
+      "rdata": {
+        "key_tag": 12345,
+        "algorithm": 13,
+        "digest_type": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+      }
+    }
+  ],
+  "dns_controls": {
+    "maximum_signature_lifetime": {
+      "ds": 604800
+    },
+    "ttl": {
+      "ns": 3600
+    }
+  }
+}
+</pre><a href="#section-10.1.2-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2203,7 +2310,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-domain-example">
 <a href="#section-10.2.1" class="section-number selfRef">10.2.1. </a><a href="#name-create-domain-example" class="section-name selfRef">Create domain example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.2.1-1">
+<p id="section-10.2.1-1">EPP XML:<a href="#section-10.2.1-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.2.1-2">
 <pre>
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
 &lt;epp xmlns="urn:ietf:params:xml:ns:epp-1.0"&gt;
@@ -2221,7 +2329,7 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
     &lt;clTRID&gt;clTRID-1234&lt;/clTRID&gt;
   &lt;/command&gt;
 &lt;/epp&gt;
-</pre><a href="#section-10.2.1-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.2.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2230,7 +2338,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-nsset-example">
 <a href="#section-10.2.2" class="section-number selfRef">10.2.2. </a><a href="#name-create-nsset-example" class="section-name selfRef">Create nsset example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.2.2-1">
+<p id="section-10.2.2-1">EPP XML:<a href="#section-10.2.2-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.2.2-2">
 <pre>
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
 &lt;epp xmlns="urn:ietf:params:xml:ns:epp-1.0"&gt;
@@ -2254,7 +2363,7 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
     &lt;clTRID&gt;clTRID-1234&lt;/clTRID&gt;
   &lt;/command&gt;
 &lt;/epp&gt;
-</pre><a href="#section-10.2.2-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.2.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2263,7 +2372,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-keyset-example">
 <a href="#section-10.2.3" class="section-number selfRef">10.2.3. </a><a href="#name-create-keyset-example" class="section-name selfRef">Create keyset example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.2.3-1">
+<p id="section-10.2.3-1">EPP XML:<a href="#section-10.2.3-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.2.3-2">
 <pre>
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
 &lt;epp xmlns="urn:ietf:params:xml:ns:epp-1.0"&gt;
@@ -2290,7 +2400,14 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
     &lt;clTRID&gt;clTRID-1234&lt;/clTRID&gt;
   &lt;/command&gt;
 &lt;/epp&gt;
-</pre><a href="#section-10.2.3-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.2.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-10.2.3-3">RPP JSON representation:<a href="#section-10.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-10.2.3-4">TODO<a href="#section-10.2.3-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-10.2.3-5">
+<pre>
+{}
+</pre><a href="#section-10.2.3-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2307,7 +2424,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-domain-with-name-ser">
 <a href="#section-10.3.1" class="section-number selfRef">10.3.1. </a><a href="#name-create-domain-with-name-ser" class="section-name selfRef">Create domain with name servers example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.3.1-1">
+<p id="section-10.3.1-1">RRI XML:<a href="#section-10.3.1-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.3.1-2">
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 &lt;registry-request
@@ -2344,7 +2462,50 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
   &lt;/domain:create&gt;
   &lt;ctid&gt;clTRID-1234&lt;/ctid&gt;
 &lt;/registry-request&gt;
-</pre><a href="#section-10.3.1-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.3.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-10.3.1-3">RPP JSON representation:<a href="#section-10.3.1-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-10.3.1-4">
+<pre>
+{
+  "@type": "Domain",
+  "name": "example.de",
+  "...": "",
+  "dns": [
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.com"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.de"
+      }
+    },
+    {
+      "name": "ns1.example.de",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    },
+    {
+      "name": "@",
+      "type": "dnskey",
+      "rdata": {
+        "flags": 257,
+        "protocol": 3,
+        "algorithm": 5,
+        "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+      }
+    }
+  ]
+}
+</pre><a href="#section-10.3.1-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2353,7 +2514,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           <h4 id="name-create-domain-without-deleg">
 <a href="#section-10.3.2" class="section-number selfRef">10.3.2. </a><a href="#name-create-domain-without-deleg" class="section-name selfRef">Create domain without delegation example</a>
           </h4>
-<div class="lang-xml sourcecode" id="section-10.3.2-1">
+<p id="section-10.3.2-1">RRI XML:<a href="#section-10.3.2-1" class="pilcrow">¶</a></p>
+<div class="lang-xml sourcecode" id="section-10.3.2-2">
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 &lt;registry-request
@@ -2372,7 +2534,26 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
   &lt;/domain:update&gt;
   &lt;ctid&gt;clTRID-1234&lt;/ctid&gt;
 &lt;/registry-request&gt;
-</pre><a href="#section-10.3.2-1" class="pilcrow">¶</a>
+</pre><a href="#section-10.3.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-10.3.2-3">RPP JSON representation:<a href="#section-10.3.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-10.3.2-4">
+<pre>
+{
+  "@type": "Domain",
+  "name": "example.de",
+    "...": "",
+  "dns": [
+    {
+      "name": "@",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    }
+  ]
+}
+</pre><a href="#section-10.3.2-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2390,7 +2571,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
           </h4>
 <p id="section-10.4.1-1">Registration Data Access Protocol (RDAP) is described in <span>[<a href="#RFC9083" class="cite xref">RFC9083</a>]</span>. An extention proposing Time-to-Live (TTL) values is described in
 <span>[<a href="#I-D.draft-brown-rdap-ttl-extension" class="cite xref">I-D.draft-brown-rdap-ttl-extension</a>]</span> and is close to adoption in the regext working group.<a href="#section-10.4.1-1" class="pilcrow">¶</a></p>
-<div class="breakable lang-json sourcecode" id="section-10.4.1-2">
+<p id="section-10.4.1-2">RDAP JSON:<a href="#section-10.4.1-2" class="pilcrow">¶</a></p>
+<div class="breakable lang-json sourcecode" id="section-10.4.1-3">
 <pre>
 {
   "objectClassName": "domain",
@@ -2442,7 +2624,7 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
   ],
   "status": ["active"]
 }
-</pre><a href="#section-10.4.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-10.4.1-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2548,8 +2730,8 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Christian Simmen</span></div>
@@ -2558,6 +2740,15 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
 <div class="email">
 <span>Email:</span>
 <a href="mailto:simmen@denic.de" class="email">simmen@denic.de</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Pawel Kowalik</span></div>
+<div dir="auto" class="left"><span class="org">DENIC eG</span></div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:pawel.kowalik@denic.de" class="email">pawel.kowalik@denic.de</a>
 </div>
 </address>
 </section>
