@@ -660,6 +660,7 @@ This document has no IANA actions.
 ### Create domain using host attributes example
 
 EPP XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -710,6 +711,7 @@ EPP XML:
 ### Create domain using host object example
 
 EPP XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -751,25 +753,26 @@ EPP XML:
 ~~~~
 
 RPP JSON representation:
+
 ~~~~ json
 {
   "@type": "Domain",
   "name": "example.com",
-  ...
+  "...": "",
   "_object_references": {
     "nameserver": [
-        {
-            "name": "ns1.example.net.",
-            "href": "https://rpp.example/nameservers/ns1.example.net",
-            "rel": "nameserver"
-        },
-        {
-            "name": "ns2.example.net.",
-            "href": "https://rpp.example/nameservers/ns2.example.net",
-            "rel": "nameserver"
-        }
+      {
+        "name": "ns1.example.net.",
+        "href": "https://rpp.example/nameservers/ns1.example.net",
+        "rel": "nameserver"
+      },
+      {
+        "name": "ns2.example.net.",
+        "href": "https://rpp.example/nameservers/ns2.example.net",
+        "rel": "nameserver"
+      }
     ]
-  },  
+  },
   "dns": [
     {
       "name": "@",
@@ -800,6 +803,7 @@ FRED is an open source registry software developed by CZ.NIC
 ### Create domain example
 
 EPP XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -822,6 +826,7 @@ EPP XML:
 ### Create nsset example
 
 EPP XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -850,6 +855,7 @@ EPP XML:
 ### Create keyset example
 
 EPP XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -879,8 +885,11 @@ EPP XML:
 ~~~~
 
 RPP JSON representation:
+
+TODO
+
 ~~~~ json
-TBD
+{}
 ~~~~
 
 
@@ -891,6 +900,7 @@ RRI is a proprietary protocol developed by DENIC
 ### Create domain with name servers example
 
 RRI XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <registry-request
@@ -930,11 +940,12 @@ RRI XML:
 ~~~~
 
 RPP JSON representation:
+
 ~~~~ json
 {
   "@type": "Domain",
   "name": "example.de",
-  ...
+  "...": "",
   "dns": [
     {
       "name": "@",
@@ -974,6 +985,7 @@ RPP JSON representation:
 ### Create domain without delegation example
 
 RRI XML:
+
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <registry-request
@@ -995,11 +1007,12 @@ RRI XML:
 ~~~~
 
 RPP JSON representation:
+
 ~~~~ json
 {
   "@type": "Domain",
   "name": "example.de",
-  ...
+    "...": "",
   "dns": [
     {
       "name": "@",
@@ -1020,6 +1033,7 @@ Registration Data Access Protocol (RDAP) is described in {{RFC9083}}. An extenti
 {{I-D.draft-brown-rdap-ttl-extension}} and is close to adoption in the regext working group.
 
 RDAP JSON:
+
 ~~~~ json
 {
   "objectClassName": "domain",
