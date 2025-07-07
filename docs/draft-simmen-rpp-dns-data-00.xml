@@ -81,7 +81,7 @@
 
 <t>While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS <xref target="RFC8484"/> and DNS-over-QUIC <xref target="RFC9250"/> driving the need for more sophisticated delegation information, such as the proposed DELEG record type <xref target="I-D.draft-ietf-deleg"/>.</t>
 
-<t>Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.</t>
+<t>Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records (RR) without formal delegation, which is expanding on Host Attribute model with other resource record types.</t>
 
 <t>The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like name server sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.</t>
 
@@ -177,27 +177,29 @@
     }
 ]]></sourcecode></figure>
 
-<t>would imply three resulting records:
-An A RR for "example.com" ("@") set to 192.0.2.1.
-An A RR for "www.example.com" ("www" relative) set to 192.0.2.2.
-An A RR for "web.example.com" (FQDN) set to 192.0.2.3.</t>
+<t>The above example implies three resulting records:</t>
+
+<t><list style="symbols">
+  <t>An "A" RR for "example.com" ("@") set to 192.0.2.1.</t>
+  <t>An "A" RR for "www.example.com" ("www" relative) set to 192.0.2.2.</t>
+  <t>An "A" RR for "web.example.com" (FQDN) set to 192.0.2.3.</t>
+</list></t>
 
 </section>
 <section anchor="class"><name>class</name>
 
-<t>A client <bcp14>SHOULD</bcp14> omit the class. The server <bcp14>MUST</bcp14> assume "IN" as class of a transferred dataset and <bcp14>MAY</bcp14> decline other values.
-If present the value <bcp14>MUST</bcp14> be chosen from section 3.2.4. CLASS values of <xref target="RFC1035"/>.</t>
+<t>A client <bcp14>SHOULD</bcp14> omit the class. The server <bcp14>MUST</bcp14> assume "IN" as class of a transferred dataset and <bcp14>MAY</bcp14> decline other values. If present the value <bcp14>MUST</bcp14> be chosen from section 3.2.4. (CLASS values) of <xref target="RFC1035"/>.</t>
 
 </section>
 <section anchor="type"><name>type</name>
 
 <t>The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
-If present the value <bcp14>MUST</bcp14> chosen from section 3.2.2. TYPE values of <xref target="RFC1035"/> or other RFC describing the RR type. Valuse <bcp14>MUST</bcp14> be converted to lower case.</t>
+If present the value <bcp14>MUST</bcp14> chosen from section 3.2.2. (TYPE values) of <xref target="RFC1035"/> or other RFC describing the RR type. Values <bcp14>MUST</bcp14> be converted to lower case.</t>
 
 </section>
 <section anchor="ttl"><name>ttl</name>
 
-<t>TTL is considered a operational control (see section 3.1.3 Operational controls and section 4.3.1 TTL). A server <bcp14>MUST</bcp14> set a default value as TTL and <bcp14>MAY</bcp14> ignore other values send by a client.</t>
+<t>TTL is considered a operational control (see section 3.1.3 and section 4.3.1 of this document). A server <bcp14>MUST</bcp14> set a default value as TTL and <bcp14>MAY</bcp14> ignore other values send by a client.</t>
 
 </section>
 <section anchor="rdlength"><name>rdlength</name>
@@ -209,10 +211,14 @@ If present the value <bcp14>MUST</bcp14> chosen from section 3.2.2. TYPE values 
 
 <t>The RDATA structure depends on the TYPE and <bcp14>MUST</bcp14> be expressed as a JSON object. Property names <bcp14>MUST</bcp14> follow the definition of the RDATA described by the corresponding RFC. Property names <bcp14>MUST</bcp14> be translated to lowercase. Whitespaces <bcp14>MUST</bcp14> be translated to underscores ("_").</t>
 
-<t>Example:
-Section 3.3.11 NS RDATA format of <xref target="RFC1035"/> describes the RDATA of a NS RR as "NSDNAME".
-Section 3.3.9 MX RDATA format of <xref target="RFC1035"/> describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
-The resulting structure is therefore:</t>
+<t>Example:</t>
+
+<t><list style="symbols">
+  <t>Section 3.3.11 (NS RDATA format) of <xref target="RFC1035"/> describes the RDATA of a NS RR having a field named "NSDNAME".</t>
+  <t>Section 3.3.9 (MX RDATA format) of <xref target="RFC1035"/> describes the RDATA of a MX RR having the field named "PREFERENCE", "EXCHANGE".</t>
+</list></t>
+
+<t>The resulting structure is therefore:</t>
 
 <figure><sourcecode type="json"><![CDATA[
     {
@@ -242,8 +248,7 @@ The resulting structure is therefore:</t>
 </section>
 <section anchor="operational-controls"><name>Operational controls</name>
 
-<t>In addition to the regular data a server <bcp14>MAY</bcp14> allow a client to control specific operational behavior.
-A client <bcp14>MAY</bcp14> add an JSON object with a number of "dns_controls" to the domain object.</t>
+<t>In addition to the regular data a server <bcp14>MAY</bcp14> allow clients to control specific operational behavior. A client <bcp14>MAY</bcp14> add an JSON object with a number of "dns_controls" to the domain object.</t>
 
 <figure><sourcecode type="json"><![CDATA[
     {
@@ -461,7 +466,7 @@ A client <bcp14>MAY</bcp14> add an JSON object with a number of "dns_controls" t
 
 <t>The TTL controls the caching behavior of DNS resource records (see Section 5 of <xref target="RFC9499"/>). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.</t>
 
-<t>A client <bcp14>MAY</bcp14> assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <bcp14>MAY</bcp14> ignore these values, e.g. for policy reasons.</t>
+<t>A client <bcp14>MAY</bcp14> assign "ttl" to the dns_controls of an RR set which is intended to be present in the parent sides DNS. A server <bcp14>MAY</bcp14> ignore these values e.g. for policy reasons.</t>
 
 <t>Example:</t>
 
@@ -497,7 +502,7 @@ A client <bcp14>MAY</bcp14> add an JSON object with a number of "dns_controls" t
 </section>
 <section anchor="maximum-signature-lifetime"><name>Maximum signature lifetime</name>
 
-<t>Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of <xref target="RFC4034"/> for information on the RRSIG resource record (RR).</t>
+<t>Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record over the signed DNS RR. See Section 3 of <xref target="RFC4034"/> for information on the RRSIG resource record.</t>
 
 <t>A client <bcp14>MAY</bcp14> assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server <bcp14>MAY</bcp14> ignore these values, e.g. for policy reasons.</t>
 
@@ -618,10 +623,13 @@ A client <bcp14>MAY</bcp14> add an JSON object with a number of "dns_controls" t
 </section>
 <section anchor="discoverability"><name>Discoverability</name>
 
-<t>The server <bcp14>MUST</bcp14> provide the following information per profile in the discovery document in section 10 of <xref target="I-D.draft-ietf-rpp-requirements"/>:
-* a list of supported resource record types
-* a list of applicable dns_controls
-* minimum, maximum and default values for dns_controls</t>
+<t>The server <bcp14>MUST</bcp14> provide the following information per profile in the discovery document in section 10 of <xref target="I-D.draft-ietf-rpp-requirements"/>:</t>
+
+<t><list style="symbols">
+  <t>A list of supported resource record types</t>
+  <t>A list of applicable dns_controls</t>
+  <t>Minimum, maximum and default values for dns_controls</t>
+</list></t>
 
 <t>TODO: Needs rewrite after definition of the discovery document</t>
 
@@ -646,7 +654,7 @@ appear in all capitals, as shown here.</t>
 
 <section anchor="authoritative-data"><name>Authoritative data</name>
 
-<t>Allowing to store authoritative resource records (see section 4.4) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers <bcp14>MUST</bcp14> take precautions to not store authoritative and non-authoritative data at the same time.</t>
+<t>Allowing to store authoritative resource records (see section 4.4 of this document) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers <bcp14>MUST</bcp14> take precautions to not store authoritative and non-authoritative data at the same time.</t>
 
 <t>The types and number of authoritative records can result in uncontrolled growth of the registries zone file and eventually exhaust the hardware resources of the registries name server. RPP servers <bcp14>SHOULD</bcp14> consider limiting the amount of authoritative records and carefully choose which record types are allowed.</t>
 
@@ -1493,7 +1501,7 @@ Protocol (EPP) that allows EPP clients to manage the Time-to-Live
       </abstract>
    </front>
    <seriesInfo name="Internet-Draft" value="draft-ietf-deleg-01"/>
-   
+
 </reference>
 
 
@@ -1515,7 +1523,7 @@ Protocol (EPP) that allows EPP clients to manage the Time-to-Live
       </abstract>
    </front>
    <seriesInfo name="Internet-Draft" value="draft-ietf-rpp-requirements-01"/>
-   
+
 </reference>
 
 
@@ -1542,7 +1550,7 @@ About this draft
       </abstract>
    </front>
    <seriesInfo name="Internet-Draft" value="draft-brown-rdap-ttl-extension-03"/>
-   
+
 </reference>
 
 
@@ -1553,7 +1561,7 @@ About this draft
 </references>
 
 
-<?line 1228?>
+<?line 1108?>
 
 <section numbered="false" anchor="acknowledgments"><name>Acknowledgments</name>
 
@@ -1747,4 +1755,3 @@ vCiT7kfn/wANvRXF64UAAA==
 -->
 
 </rfc>
-

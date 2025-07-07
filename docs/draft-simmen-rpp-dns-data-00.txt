@@ -88,9 +88,9 @@ Table of Contents
        3.1.1.  DNS data extending an domain object . . . . . . . . .   4
        3.1.2.  DNS record structure representation . . . . . . . . .   5
        3.1.3.  Operational controls  . . . . . . . . . . . . . . . .   8
-       3.1.4.  Future DNS record types . . . . . . . . . . . . . . .   8
-   4.  Use cases . . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     4.1.  Domain delegation (Host Attribute)  . . . . . . . . . . .   8
+       3.1.4.  Future DNS record types . . . . . . . . . . . . . . .   9
+   4.  Use cases . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  Domain delegation (Host Attribute)  . . . . . . . . . . .   9
      4.2.  Host Object . . . . . . . . . . . . . . . . . . . . . . .  10
      4.3.  DNSSEC  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      4.4.  Operational controls  . . . . . . . . . . . . . . . . . .  13
@@ -101,7 +101,7 @@ Table of Contents
    6.  EPP compatibility considerations  . . . . . . . . . . . . . .  17
    7.  Conventions and Definitions . . . . . . . . . . . . . . . . .  17
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
-     8.1.  Authoritative data  . . . . . . . . . . . . . . . . . . .  17
+     8.1.  Authoritative data  . . . . . . . . . . . . . . . . . . .  18
      8.2.  Host references within the rdata field  . . . . . . . . .  18
    9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
    10. Appendix A.  Examples from current implementations  . . . . .  18
@@ -152,8 +152,9 @@ Internet-Draft         RPP DNS data representation             July 2025
    Some registry operators have developed their own proprietary
    solutions.  These include grouping name servers into "sets" for
    easier management or allowing domains to be provisioned with
-   arbitrary DNS resource records without formal delegation, which is
-   expanding on Host Attribute model with other Resource Record types.
+   arbitrary DNS resource records (RR) without formal delegation, which
+   is expanding on Host Attribute model with other resource record
+   types.
 
    The development of the RESTful Provisioning Protocol (RPP) provides
    an opportunity to address this fragmentation.  This document proposes
@@ -310,23 +311,23 @@ Internet-Draft         RPP DNS data representation             July 2025
          ]
        }
 
-   would imply three resulting records: An A RR for "example.com" ("@")
-   set to 192.0.2.1.  An A RR for "www.example.com" ("www" relative) set
-   to 192.0.2.2.  An A RR for "web.example.com" (FQDN) set to 192.0.2.3.
+   The above example implies three resulting records:
+
+   *  An "A" RR for "example.com" ("@") set to 192.0.2.1.
+
+   *  An "A" RR for "www.example.com" ("www" relative) set to 192.0.2.2.
+
+   *  An "A" RR for "web.example.com" (FQDN) set to 192.0.2.3.
 
 3.1.2.2.  class
 
    A client SHOULD omit the class.  The server MUST assume "IN" as class
    of a transferred dataset and MAY decline other values.  If present
-   the value MUST be chosen from section 3.2.4.  CLASS values of
+   the value MUST be chosen from section 3.2.4.  (CLASS values) of
    [RFC1035].
 
-3.1.2.3.  type
 
-   The TYPE of data present in the RDATA.  This also implies the
-   expected fields in RDATA.  If present the value MUST chosen from
-   section 3.2.2.  TYPE values of [RFC1035] or other RFC describing the
-   RR type.  Valuse MUST be converted to lower case.
+
 
 
 
@@ -338,11 +339,18 @@ Simmen & Kowalik         Expires 8 January 2026                 [Page 6]
 Internet-Draft         RPP DNS data representation             July 2025
 
 
+3.1.2.3.  type
+
+   The TYPE of data present in the RDATA.  This also implies the
+   expected fields in RDATA.  If present the value MUST chosen from
+   section 3.2.2.  (TYPE values) of [RFC1035] or other RFC describing
+   the RR type.  Values MUST be converted to lower case.
+
 3.1.2.4.  ttl
 
-   TTL is considered a operational control (see section 3.1.3
-   Operational controls and section 4.3.1 TTL).  A server MUST set a
-   default value as TTL and MAY ignore other values send by a client.
+   TTL is considered a operational control (see section 3.1.3 and
+   section 4.3.1 of this document).  A server MUST set a default value
+   as TTL and MAY ignore other values send by a client.
 
 3.1.2.5.  rdlength
 
@@ -358,10 +366,34 @@ Internet-Draft         RPP DNS data representation             July 2025
    translated to lowercase.  Whitespaces MUST be translated to
    underscores ("_").
 
-   Example: Section 3.3.11 NS RDATA format of [RFC1035] describes the
-   RDATA of a NS RR as "NSDNAME".  Section 3.3.9 MX RDATA format of
-   [RFC1035] describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
+   Example:
+
+   *  Section 3.3.11 (NS RDATA format) of [RFC1035] describes the RDATA
+      of a NS RR having a field named "NSDNAME".
+
+   *  Section 3.3.9 (MX RDATA format) of [RFC1035] describes the RDATA
+      of a MX RR having the field named "PREFERENCE", "EXCHANGE".
+
    The resulting structure is therefore:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik         Expires 8 January 2026                 [Page 7]
+
+Internet-Draft         RPP DNS data representation             July 2025
+
 
        {
          "@type": "Domain",
@@ -385,20 +417,11 @@ Internet-Draft         RPP DNS data representation             July 2025
          ]
        }
 
-
-
-
-
-Simmen & Kowalik         Expires 8 January 2026                 [Page 7]
-
-Internet-Draft         RPP DNS data representation             July 2025
-
-
 3.1.3.  Operational controls
 
-   In addition to the regular data a server MAY allow a client to
-   control specific operational behavior.  A client MAY add an JSON
-   object with a number of "dns_controls" to the domain object.
+   In addition to the regular data a server MAY allow clients to control
+   specific operational behavior.  A client MAY add an JSON object with
+   a number of "dns_controls" to the domain object.
 
        {
          "@type": "Domain",
@@ -416,6 +439,17 @@ Internet-Draft         RPP DNS data representation             July 2025
            "<named_control>": "<named_control_value>"
          }
        }
+
+
+
+
+
+
+
+Simmen & Kowalik         Expires 8 January 2026                 [Page 8]
+
+Internet-Draft         RPP DNS data representation             July 2025
+
 
 3.1.4.  Future DNS record types
 
@@ -438,17 +472,6 @@ Internet-Draft         RPP DNS data representation             July 2025
 
    A minimal delegation can be expressed by adding an array of name
    servers to the DNS data of a domain:
-
-
-
-
-
-
-
-Simmen & Kowalik         Expires 8 January 2026                 [Page 8]
-
-Internet-Draft         RPP DNS data representation             July 2025
-
 
        {
          "@type": "Domain",
@@ -473,28 +496,6 @@ Internet-Draft         RPP DNS data representation             July 2025
 
    If GLUE records are needed the client may add records of type "A" or
    "AAAA" :
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -715,8 +716,8 @@ Internet-Draft         RPP DNS data representation             July 2025
    change the TTL value.
 
    A client MAY assign "ttl" to the dns_controls of an RR set which is
-   intended to be signed on the parent side.  A server MAY ignore these
-   values, e.g. for policy reasons.
+   intended to be present in the parent sides DNS.  A server MAY ignore
+   these values e.g. for policy reasons.
 
    Example:
 
@@ -763,8 +764,8 @@ Internet-Draft         RPP DNS data representation             July 2025
    maximum number of seconds after signature generation a parents
    signature on signed DNS information should expire.  The
    maximum_signature_lifetime value applies to the RRSIG resource record
-   (RR) over the signed DNS RR.  See Section 3 of [RFC4034] for
-   information on the RRSIG resource record (RR).
+   over the signed DNS RR.  See Section 3 of [RFC4034] for information
+   on the RRSIG resource record.
 
    A client MAY assign "maximum_signature_lifetime" to the dns_controls
    of an RR set which is intended to be signed on the parent side.  A
@@ -919,9 +920,13 @@ Internet-Draft         RPP DNS data representation             July 2025
 
    The server MUST provide the following information per profile in the
    discovery document in section 10 of
-   [I-D.draft-ietf-rpp-requirements]: * a list of supported resource
-   record types * a list of applicable dns_controls * minimum, maximum
-   and default values for dns_controls
+   [I-D.draft-ietf-rpp-requirements]:
+
+   *  A list of supported resource record types
+
+   *  A list of applicable dns_controls
+
+   *  Minimum, maximum and default values for dns_controls
 
    TODO: Needs rewrite after definition of the discovery document
 
@@ -939,13 +944,9 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 8.  Security Considerations
 
-8.1.  Authoritative data
 
-   Allowing to store authoritative resource records (see section 4.4) in
-   the registry provides faster resolution.  However, if not done
-   properly situations may occur where the data served authoritative
-   should have been delegated.  RPP servers MUST take precautions to not
-   store authoritative and non-authoritative data at the same time.
+
+
 
 
 
@@ -953,6 +954,15 @@ Simmen & Kowalik         Expires 8 January 2026                [Page 17]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
+
+8.1.  Authoritative data
+
+   Allowing to store authoritative resource records (see section 4.4 of
+   this document) in the registry provides faster resolution.  However,
+   if not done properly situations may occur where the data served
+   authoritative should have been delegated.  RPP servers MUST take
+   precautions to not store authoritative and non-authoritative data at
+   the same time.
 
    The types and number of authoritative records can result in
    uncontrolled growth of the registries zone file and eventually
@@ -991,15 +1001,6 @@ Internet-Draft         RPP DNS data representation             July 2025
 10.1.1.  Create domain using host attributes example
 
    EPP XML:
-
-
-
-
-
-
-
-
-
 
 
 
