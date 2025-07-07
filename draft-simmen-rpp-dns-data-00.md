@@ -93,7 +93,7 @@ The Extensible Provisioning Protocol (EPP) manages DNS delegation data using dis
 
 While functional, this segmented approach creates complexity. The DNS landscape itself is evolving, with new transport protocols like DNS-over-HTTPS {{RFC8484}} and DNS-over-QUIC {{RFC9250}} driving the need for more sophisticated delegation information, such as the proposed DELEG record type {{I-D.draft-ietf-deleg}}.
 
-Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records without formal delegation, which is expanding on Host Attribute model with other Resource Record types.
+Some registry operators have developed their own proprietary solutions. These include grouping name servers into "sets" for easier management or allowing domains to be provisioned with arbitrary DNS resource records (RR) without formal delegation, which is expanding on Host Attribute model with other resource record types.
 
 The development of the RESTful Provisioning Protocol (RPP) provides an opportunity to address this fragmentation. This document proposes a unified data representation for all DNS-related information, specified in a format that directly mirrors DNS resource records. This approach is not intended to influence existing registry data models, but rather to offer a flexible and consistent structure for the data in the protocol. By unifying the representation of delegation data (NS, A/AAAA glue), DNSSEC information, and other record types, this model can be applied across various contexts. It is designed to be equally applicable whether a registry uses separate host objects, host attributes within a domain, or more abstract concepts like name server sets, thereby simplifying implementation and ensuring adaptability for future developments in the DNS.
 
@@ -187,24 +187,24 @@ Example:
     }
 ~~~~
 
-would imply three resulting records:
-An A RR for "example.com" ("@") set to 192.0.2.1.
-An A RR for "www.example.com" ("www" relative) set to 192.0.2.2.
-An A RR for "web.example.com" (FQDN) set to 192.0.2.3.
+The above example implies three resulting records:
+
+* An "A" RR for "example.com" ("@") set to 192.0.2.1.
+* An "A" RR for "www.example.com" ("www" relative) set to 192.0.2.2.
+* An "A" RR for "web.example.com" (FQDN) set to 192.0.2.3.
 
 #### class
 
-A client SHOULD omit the class. The server MUST assume "IN" as class of a transferred dataset and MAY decline other values.
-If present the value MUST be chosen from section 3.2.4. CLASS values of {{RFC1035}}.
+A client SHOULD omit the class. The server MUST assume "IN" as class of a transferred dataset and MAY decline other values. If present the value MUST be chosen from section 3.2.4. (CLASS values) of {{RFC1035}}.
 
 #### type
 
 The TYPE of data present in the RDATA. This also implies the expected fields in RDATA.
-If present the value MUST chosen from section 3.2.2. TYPE values of {{RFC1035}} or other RFC describing the RR type. Valuse MUST be converted to lower case.
+If present the value MUST chosen from section 3.2.2. (TYPE values) of {{RFC1035}} or other RFC describing the RR type. Values MUST be converted to lower case.
 
 #### ttl
 
-TTL is considered a operational control (see section 3.1.3 Operational controls and section 4.3.1 TTL). A server MUST set a default value as TTL and MAY ignore other values send by a client.
+TTL is considered a operational control (see section 3.1.3 and section 4.3.1 of this document). A server MUST set a default value as TTL and MAY ignore other values send by a client.
 
 #### rdlength
 
@@ -215,8 +215,10 @@ RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A c
 The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be translated to lowercase. Whitespaces MUST be translated to underscores ("_").
 
 Example:
-Section 3.3.11 NS RDATA format of {{RFC1035}} describes the RDATA of a NS RR as "NSDNAME".
-Section 3.3.9 MX RDATA format of {{RFC1035}} describes the RDATA of a MX RR as "PREFERENCE", "EXCHANGE".
+
+* Section 3.3.11 (NS RDATA format) of {{RFC1035}} describes the RDATA of a NS RR having a field named "NSDNAME".
+* Section 3.3.9 (MX RDATA format) of {{RFC1035}} describes the RDATA of a MX RR having the field named "PREFERENCE", "EXCHANGE".
+
 The resulting structure is therefore:
 
 ~~~~ json
@@ -245,8 +247,7 @@ The resulting structure is therefore:
 
 ### Operational controls
 
-In addition to the regular data a server MAY allow a client to control specific operational behavior.
-A client MAY add an JSON object with a number of "dns_controls" to the domain object.
+In addition to the regular data a server MAY allow clients to control specific operational behavior. A client MAY add an JSON object with a number of "dns_controls" to the domain object.
 
 ~~~~ json
     {
@@ -457,7 +458,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
 
 The TTL controls the caching behavior of DNS resource records (see Section 5 of {{RFC9499}}). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.
 
-A client MAY assign "ttl" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+A client MAY assign "ttl" to the dns_controls of an RR set which is intended to be present in the parent sides DNS. A server MAY ignore these values e.g. for policy reasons.
 
 Example:
 
@@ -492,7 +493,7 @@ Example:
 
 ### Maximum signature lifetime
 
-Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record (RR) over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record (RR).
+Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record.
 
 A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
 
@@ -610,9 +611,10 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 # Discoverability
 
 The server MUST provide the following information per profile in the discovery document in section 10 of {{I-D.draft-ietf-rpp-requirements}}:
-* a list of supported resource record types
-* a list of applicable dns_controls
-* minimum, maximum and default values for dns_controls
+
+* A list of supported resource record types
+* A list of applicable dns_controls
+* Minimum, maximum and default values for dns_controls
 
 TODO: Needs rewrite after definition of the discovery document
 
@@ -629,7 +631,7 @@ TODO
 
 ## Authoritative data
 
-Allowing to store authoritative resource records (see section 4.4) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers MUST take precautions to not store authoritative and non-authoritative data at the same time.
+Allowing to store authoritative resource records (see section 4.4 of this document) in the registry provides faster resolution. However, if not done properly situations may occur where the data served authoritative should have been delegated. RPP servers MUST take precautions to not store authoritative and non-authoritative data at the same time.
 
 The types and number of authoritative records can result in uncontrolled growth of the registries zone file and eventually exhaust the hardware resources of the registries name server. RPP servers SHOULD consider limiting the amount of authoritative records and carefully choose which record types are allowed.
 
