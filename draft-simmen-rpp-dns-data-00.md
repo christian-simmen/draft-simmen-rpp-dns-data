@@ -708,6 +708,71 @@ EPP XML:
 </epp>
 ~~~~
 
+RPP JSON representation:
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "...": "",
+  "dns": [
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.com"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "aaaa",
+      "rdata": {
+        "address": "2001:db8::1"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns2.example.com"
+      }
+    },
+    {
+      "name": "ns2.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.2"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ds",
+      "rdata": {
+        "key_tag": 12345,
+        "algorithm": 13,
+        "digest_type": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+      }
+    }
+  ],
+  "dns_controls": {
+    "maximum_signature_lifetime": {
+      "ds": 604800
+    },
+    "ttl": {
+      "ns": 3600
+    }
+  }
+}
+~~~~
+
 ### Create domain using host object example
 
 EPP XML:
@@ -793,6 +858,61 @@ RPP JSON representation:
       "ns": 3600
     }
   }
+}
+~~~~
+
+### Create host object example
+
+EPP XML:
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <host:create
+       xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+        <host:name>ns1.example.com</host:name>
+        <host:addr ip="v4">192.0.2.2</host:addr>
+        <host:addr ip="v4">192.0.2.29</host:addr>
+        <host:addr ip="v6">1080:0:0:0:8:800:200C:417A</host:addr>
+      </host:create>
+    </create>
+    <clTRID>ABC-12345</clTRID>
+  </command>
+</epp>
+~~~~
+
+RPP JSON representation:
+
+~~~~ json
+{
+    "@type": "Host",
+    "...": "",
+    "name": "ns1.example.com",
+    "dns": [
+        {
+            "name": "@",
+            "type": "a",
+            "rdata": {
+                "address": "192.0.2.2"
+            }
+        },
+        {
+            "name": "@",
+            "type": "a",
+            "rdata": {
+                "address": "192.0.2.29"
+            }
+        },
+        {
+            "name": "@",
+            "type": "aaaa",
+            "rdata": {
+                "address": "1080:0:0:0:8:800:200C:417A"
+            }
+        }
+    ]
 }
 ~~~~
 
