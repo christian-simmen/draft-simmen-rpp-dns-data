@@ -53,11 +53,18 @@ author:
     country: DE
     email: simmen@denic.de
 
+ -
+    fullname: Pawel Kowalik
+    organization: DENIC eG
+    country: DE
+    email: pawel.kowalik@denic.de
+
+
 normative:
   RFC1035:
+  RFC5731:
   RFC5732:
   RFC5910:
-  RFC5731:
   RFC9803:
   RFC3596:
   RFC4034:
@@ -120,7 +127,8 @@ Delegation data, as well as DNSSEC data, is intended to find it's way into the p
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "",
@@ -151,7 +159,8 @@ Example:
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -212,7 +221,8 @@ The resulting structure is therefore:
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -240,7 +250,8 @@ A client MAY add an JSON object with a number of "dns_controls" to the domain ob
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "<name>",
@@ -262,15 +273,18 @@ Future record types SHOULD be added by breaking down the RDATA field specified b
 
 ## Use cases
 
-### Domain delegation
+### Domain delegation (Host Attribute)
 
-To enable domain delegation a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}},{{RFC3596}}).
+To enable domain delegation a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}}, {{RFC3596}}).
+
+In this delegation model the delegation information and corresponding DNS configuration is attached directly to a domain object. This is corresponding to Host Attribute delegation model of {{RFC5731}}.
 
 A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -294,7 +308,8 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -328,13 +343,52 @@ If GLUE records are needed the client may add records of type "A" or "AAAA" :
     }
 ~~~~
 
+### Host Object
+
+{{RFC5731}} specifies how domain delegation can be expressed as a relation to a separate provisioning object (Host Object), which carries the DNS configuration (name and glue records), with details specified in {{RFC5732}}.
+
+To enable specification of Host Objexts, similar to direct domain delegation, a server MUST support the "NS", "A" and "AAAA" record types ({{RFC1035}}, {{RFC3596}}).
+
+DNS configuration of Host Object is specified by NS, A and AAAA configuration within "dns" data structure:
+
+~~~~ json
+    {
+      "@type": "Host",
+      "name": "ns.example.com",
+      "dns": [
+        {
+          "name": "@",
+          "type": "ns",
+          "rdata": {
+            "nsdname": "ns.example.com"
+          }
+        },
+        {
+          "name": "ns.example.com.",
+          "type": "a",
+          "rdata": {
+            "address": "192.0.2.1"
+          }
+        },
+        {
+          "name": "ns.example.com.",
+          "type": "aaaa",
+          "rdata": {
+            "address": "2001:DB8::1"
+          }
+        }
+      ]
+    }
+~~~~
+
 ### DNSSEC
 
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -366,7 +420,8 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
 
 ~~~~ json
     {
-      "domain": "example.com.",
+      "@type": "Domain",
+      "name": "example.com.",
       "dns": [
         {
           "name": "@",
@@ -408,7 +463,8 @@ Example:
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -444,7 +500,8 @@ Example:
 
 ~~~~ json
     {
-      "domain": "example.com",
+      "@type": "Domain",
+      "name": "example.com",
       "dns": [
         {
           "name": "@",
@@ -485,7 +542,8 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 
 ~~~~ json
 {
-  "domain": "example.com",
+  "@type": "Domain",
+  "name": "example.com",
   "dns": [
     {
       "name": "@",
@@ -595,6 +653,7 @@ This document has no IANA actions.
 
 ### Create domain using host attributes example
 
+EPP XML:
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -642,8 +701,73 @@ This document has no IANA actions.
 </epp>
 ~~~~
 
-### ### Create domain using host object example
+RPP JSON representation:
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  ...
+  "dns": [
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.com"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "aaaa",
+      "rdata": {
+        "address": "2001:db8::1"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns2.example.com"
+      }
+    },
+    {
+      "name": "ns2.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.2"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ds",
+      "rdata": {
+        "key_tag": 12345,
+        "algorithm": 13,
+        "digest_type": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+      }
+    }
+  ],
+  "dns_controls": {
+    "maximum_signature_lifetime": {
+      "ds": 604800
+    },
+    "ttl": {
+      "ns": 3600
+    }
+  }
+}
+~~~~
 
+### Create domain using host object example
+
+EPP XML:
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -684,6 +808,48 @@ This document has no IANA actions.
 </epp>
 ~~~~
 
+RPP JSON representation:
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  ...
+  "_object_references": {
+    "nameserver": [
+        {
+            "name": "ns1.example.net.",
+            "href": "https://rpp.example/nameservers/ns1.example.net",
+            "rel": "nameserver"
+        },
+        {
+            "name": "ns2.example.net.",
+            "href": "https://rpp.example/nameservers/ns2.example.net",
+            "rel": "nameserver"
+        }
+    ]
+  },  
+  "dns": [
+    {
+      "name": "@",
+      "type": "ds",
+      "rdata": {
+        "key_tag": 12345,
+        "algorithm": 13,
+        "digest_type": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+      }
+    }
+  ],
+  "dns_controls": {
+    "maximum_signature_lifetime": {
+      "ds": 604800
+    },
+    "ttl": {
+      "ns": 3600
+    }
+  }
+}
+~~~~
 
 ## Free Registry for ENUM and Domains (FRED)
 
@@ -691,6 +857,7 @@ FRED is an open source registry software developed by CZ.NIC
 
 ### Create domain example
 
+EPP XML:
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -712,6 +879,7 @@ FRED is an open source registry software developed by CZ.NIC
 
 ### Create nsset example
 
+EPP XML:
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -739,6 +907,7 @@ FRED is an open source registry software developed by CZ.NIC
 
 ### Create keyset example
 
+EPP XML:
 ~~~~ xml
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -767,12 +936,19 @@ FRED is an open source registry software developed by CZ.NIC
 </epp>
 ~~~~
 
+RPP JSON representation:
+~~~~ json
+TBD
+~~~~
+
+
 ## Realtime Registry Interface (RRI)
 
 RRI is a proprietary protocol developed by DENIC
 
 ### Create domain with name servers example
 
+RRI XML:
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <registry-request
@@ -811,8 +987,51 @@ RRI is a proprietary protocol developed by DENIC
 </registry-request>
 ~~~~
 
+RPP JSON representation:
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.de",
+  ...
+  "dns": [
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.com"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.de"
+      }
+    },
+    {
+      "name": "ns1.example.de",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    },
+    {
+      "name": "@",
+      "type": "dnskey",
+      "rdata": {
+        "flags": 257,
+        "protocol": 3,
+        "algorithm": 5,
+        "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+      }
+    }
+  ]
+}
+~~~~
+
 ### Create domain without delegation example
 
+RRI XML:
 ~~~~ xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <registry-request
@@ -833,11 +1052,30 @@ RRI is a proprietary protocol developed by DENIC
 </registry-request>
 ~~~~
 
+RPP JSON representation:
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.de",
+  ...
+  "dns": [
+    {
+      "name": "@",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    }
+  ]
+}
+~~~~
+
 ## RDAP
 
 Registration Data Access Protocol (RDAP) is described in {{RFC9083}}. An extention proposing Time-to-Live (TTL) values is described in
 {{I-D.draft-brown-rdap-ttl-extension}} and is close to adoption in the regext working group.
 
+RDAP JSON:
 ~~~~ json
 {
   "objectClassName": "domain",
