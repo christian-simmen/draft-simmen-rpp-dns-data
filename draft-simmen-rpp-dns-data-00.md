@@ -861,6 +861,61 @@ RPP JSON representation:
 }
 ~~~~
 
+### Create host object example
+
+EPP XML:
+
+~~~~ xml
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <command>
+    <create>
+      <host:create
+       xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+        <host:name>ns1.example.com</host:name>
+        <host:addr ip="v4">192.0.2.2</host:addr>
+        <host:addr ip="v4">192.0.2.29</host:addr>
+        <host:addr ip="v6">1080:0:0:0:8:800:200C:417A</host:addr>
+      </host:create>
+    </create>
+    <clTRID>ABC-12345</clTRID>
+  </command>
+</epp>
+~~~~
+
+RPP JSON representation:
+
+~~~~ json
+{
+    "@type": "Host",
+    "...": "",
+    "name": "ns1.example.com",
+    "dns": [
+        {
+            "name": "@",
+            "type": "a",
+            "rdata": {
+                "address": "192.0.2.2"
+            }
+        },
+        {
+            "name": "@",
+            "type": "a",
+            "rdata": {
+                "address": "192.0.2.29"
+            }
+        },
+        {
+            "name": "@",
+            "type": "aaaa",
+            "rdata": {
+                "address": "1080:0:0:0:8:800:200C:417A"
+            }
+        }
+    ]
+}
+~~~~
+
 ## Free Registry for ENUM and Domains (FRED)
 
 FRED is an open source registry software developed by CZ.NIC

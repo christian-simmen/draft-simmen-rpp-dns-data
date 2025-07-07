@@ -116,20 +116,21 @@ Internet-Draft         RPP DNS data representation             July 2025
 
        10.1.1.  Create domain using host attributes example  . . . .  18
        10.1.2.  Create domain using host object example  . . . . . .  21
-     10.2.  Free Registry for ENUM and Domains (FRED)  . . . . . . .  23
-       10.2.1.  Create domain example  . . . . . . . . . . . . . . .  23
-       10.2.2.  Create nsset example . . . . . . . . . . . . . . . .  24
-       10.2.3.  Create keyset example  . . . . . . . . . . . . . . .  24
-     10.3.  Realtime Registry Interface (RRI)  . . . . . . . . . . .  25
-       10.3.1.  Create domain with name servers example  . . . . . .  25
-       10.3.2.  Create domain without delegation example . . . . . .  27
-     10.4.  RDAP . . . . . . . . . . . . . . . . . . . . . . . . . .  28
-       10.4.1.  Domain object  . . . . . . . . . . . . . . . . . . .  28
-   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  30
-     11.1.  Normative References . . . . . . . . . . . . . . . . . .  30
-     11.2.  Informative References . . . . . . . . . . . . . . . . .  31
-   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  31
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  32
+       10.1.3.  Create host object example . . . . . . . . . . . . .  23
+     10.2.  Free Registry for ENUM and Domains (FRED)  . . . . . . .  25
+       10.2.1.  Create domain example  . . . . . . . . . . . . . . .  25
+       10.2.2.  Create nsset example . . . . . . . . . . . . . . . .  25
+       10.2.3.  Create keyset example  . . . . . . . . . . . . . . .  26
+     10.3.  Realtime Registry Interface (RRI)  . . . . . . . . . . .  27
+       10.3.1.  Create domain with name servers example  . . . . . .  27
+       10.3.2.  Create domain without delegation example . . . . . .  29
+     10.4.  RDAP . . . . . . . . . . . . . . . . . . . . . . . . . .  30
+       10.4.1.  Domain object  . . . . . . . . . . . . . . . . . . .  30
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  32
+     11.1.  Normative References . . . . . . . . . . . . . . . . . .  32
+     11.2.  Informative References . . . . . . . . . . . . . . . . .  33
+   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  33
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
 
 1.  Introduction
 
@@ -161,7 +162,6 @@ Internet-Draft         RPP DNS data representation             July 2025
    This approach is not intended to influence existing registry data
    models, but rather to offer a flexible and consistent structure for
    the data in the protocol.  By unifying the representation of
-   delegation data (NS, A/AAAA glue), DNSSEC information, and other
 
 
 
@@ -170,6 +170,7 @@ Simmen & Kowalik         Expires 8 January 2026                 [Page 3]
 Internet-Draft         RPP DNS data representation             July 2025
 
 
+   delegation data (NS, A/AAAA glue), DNSSEC information, and other
    record types, this model can be applied across various contexts.  It
    is designed to be equally applicable whether a registry uses separate
    host objects, host attributes within a domain, or more abstract
@@ -216,7 +217,6 @@ Internet-Draft         RPP DNS data representation             July 2025
    this array MUST be a representation of the top level format as
    described in section 3.2.1 of [RFC1035].  All keys MUST be lowercase.
    Whitespaces MUST be translated to underscores ("_").
-
 
 
 
@@ -1274,13 +1274,13 @@ Internet-Draft         RPP DNS data representation             July 2025
      }
    }
 
-10.2.  Free Registry for ENUM and Domains (FRED)
-
-   FRED is an open source registry software developed by CZ.NIC
-
-10.2.1.  Create domain example
+10.1.3.  Create host object example
 
    EPP XML:
+
+
+
+
 
 
 
@@ -1289,6 +1289,70 @@ Simmen & Kowalik         Expires 8 January 2026                [Page 23]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
+
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <host:create
+          xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+           <host:name>ns1.example.com</host:name>
+           <host:addr ip="v4">192.0.2.2</host:addr>
+           <host:addr ip="v4">192.0.2.29</host:addr>
+           <host:addr ip="v6">1080:0:0:0:8:800:200C:417A</host:addr>
+         </host:create>
+       </create>
+       <clTRID>ABC-12345</clTRID>
+     </command>
+   </epp>
+
+   RPP JSON representation:
+
+   {
+       "@type": "Host",
+       "...": "",
+       "name": "ns1.example.com",
+       "dns": [
+           {
+               "name": "@",
+               "type": "a",
+               "rdata": {
+                   "address": "192.0.2.2"
+               }
+           },
+           {
+               "name": "@",
+               "type": "a",
+               "rdata": {
+                   "address": "192.0.2.29"
+               }
+           },
+           {
+               "name": "@",
+               "type": "aaaa",
+               "rdata": {
+                   "address": "1080:0:0:0:8:800:200C:417A"
+               }
+           }
+       ]
+   }
+
+
+
+
+
+Simmen & Kowalik         Expires 8 January 2026                [Page 24]
+
+Internet-Draft         RPP DNS data representation             July 2025
+
+
+10.2.  Free Registry for ENUM and Domains (FRED)
+
+   FRED is an open source registry software developed by CZ.NIC
+
+10.2.1.  Create domain example
+
+   EPP XML:
 
    <?xml version="1.0" encoding="utf-8" standalone="no"?>
    <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -1310,6 +1374,33 @@ Internet-Draft         RPP DNS data representation             July 2025
 10.2.2.  Create nsset example
 
    EPP XML:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik         Expires 8 January 2026                [Page 25]
+
+Internet-Draft         RPP DNS data representation             July 2025
+
 
    <?xml version="1.0" encoding="utf-8" standalone="no"?>
    <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
@@ -1341,7 +1432,28 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 24]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik         Expires 8 January 2026                [Page 26]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1397,7 +1509,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 25]
+Simmen & Kowalik         Expires 8 January 2026                [Page 27]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1453,7 +1565,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 26]
+Simmen & Kowalik         Expires 8 January 2026                [Page 28]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1509,7 +1621,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 27]
+Simmen & Kowalik         Expires 8 January 2026                [Page 29]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1565,7 +1677,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 28]
+Simmen & Kowalik         Expires 8 January 2026                [Page 30]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1621,7 +1733,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 29]
+Simmen & Kowalik         Expires 8 January 2026                [Page 31]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1677,7 +1789,7 @@ Internet-Draft         RPP DNS data representation             July 2025
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 30]
+Simmen & Kowalik         Expires 8 January 2026                [Page 32]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1733,7 +1845,7 @@ Acknowledgments
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 31]
+Simmen & Kowalik         Expires 8 January 2026                [Page 33]
 
 Internet-Draft         RPP DNS data representation             July 2025
 
@@ -1789,4 +1901,4 @@ Authors' Addresses
 
 
 
-Simmen & Kowalik         Expires 8 January 2026                [Page 32]
+Simmen & Kowalik         Expires 8 January 2026                [Page 34]
