@@ -821,6 +821,69 @@ Table of Contents
      </command>
    </epp>
 
+   RPP JSON representation:
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "...": "",
+     "dns": [
+       {
+         "name": "@",
+         "type": "ns",
+         "rdata": {
+           "nsdname": "ns1.example.com"
+         }
+       },
+       {
+         "name": "ns1.example.com",
+         "type": "a",
+         "rdata": {
+           "address": "192.0.2.1"
+         }
+       },
+       {
+         "name": "ns1.example.com",
+         "type": "aaaa",
+         "rdata": {
+           "address": "2001:db8::1"
+         }
+       },
+       {
+         "name": "@",
+         "type": "ns",
+         "rdata": {
+           "nsdname": "ns2.example.com"
+         }
+       },
+       {
+         "name": "ns2.example.com",
+         "type": "a",
+         "rdata": {
+           "address": "192.0.2.2"
+         }
+       },
+       {
+         "name": "@",
+         "type": "ds",
+         "rdata": {
+           "key_tag": 12345,
+           "algorithm": 13,
+           "digest_type": 2,
+           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+         }
+       }
+     ],
+     "dns_controls": {
+       "maximum_signature_lifetime": {
+         "ds": 604800
+       },
+       "ttl": {
+         "ns": 3600
+       }
+     }
+   }
+
 10.1.2.  Create domain using host object example
 
    EPP XML:
@@ -1243,9 +1306,9 @@ Table of Contents
    [I-D.draft-ietf-deleg]
               April, T., Špaček, P., Weber, R., and Lawrence,
               "Extensible Delegation for DNS", Work in Progress,
-              Internet-Draft, draft-ietf-deleg-00, 6 May 2025,
+              Internet-Draft, draft-ietf-deleg-01, 7 July 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-deleg-
-              00>.
+              01>.
 
    [I-D.draft-ietf-rpp-requirements]
               Wullink, M. and P. Kowalik, "RESTful Provisioning Protocol

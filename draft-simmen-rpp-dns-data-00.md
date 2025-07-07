@@ -708,6 +708,71 @@ EPP XML:
 </epp>
 ~~~~
 
+RPP JSON representation:
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "...": "",
+  "dns": [
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns1.example.com"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.1"
+      }
+    },
+    {
+      "name": "ns1.example.com",
+      "type": "aaaa",
+      "rdata": {
+        "address": "2001:db8::1"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ns",
+      "rdata": {
+        "nsdname": "ns2.example.com"
+      }
+    },
+    {
+      "name": "ns2.example.com",
+      "type": "a",
+      "rdata": {
+        "address": "192.0.2.2"
+      }
+    },
+    {
+      "name": "@",
+      "type": "ds",
+      "rdata": {
+        "key_tag": 12345,
+        "algorithm": 13,
+        "digest_type": 2,
+        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+      }
+    }
+  ],
+  "dns_controls": {
+    "maximum_signature_lifetime": {
+      "ds": 604800
+    },
+    "ttl": {
+      "ns": 3600
+    }
+  }
+}
+~~~~
+
 ### Create domain using host object example
 
 EPP XML:
