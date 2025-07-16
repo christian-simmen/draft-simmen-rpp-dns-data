@@ -358,13 +358,6 @@ DNS configuration of Host Object is specified by NS, A and AAAA configuration wi
       "name": "ns.example.com",
       "dns": [
         {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns.example.com"
-          }
-        },
-        {
           "name": "ns.example.com.",
           "type": "a",
           "rdata": {
