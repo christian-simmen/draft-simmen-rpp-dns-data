@@ -123,22 +123,26 @@ RDATA     The actual payload data. Structures defer for each type.
 ## Rules
 
 ### DNS data extending an domain object
-Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an array of DNS entries. The properties of an object in this array MUST be a representation of the top level format as described in section 3.2.1 of {{RFC1035}}. All keys MUST be lowercase. Whitespaces MUST be translated to underscores ("_").
+Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an "dns" object having an array of DNS "records" and a facility for signaling parameters to "control" operational behavior. The top level format of a DNS resource record as described in section 3.2.1 of {{RFC1035}} is converted into properties. Keys MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter.
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "",
-          "class": "",
-          "type": "",
-          "ttl": "",
-          "rdata": {}
-        }
-      ]
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "",
+        "class": "",
+        "type": "",
+        "rdata": {}
+      }
+    ],
+    "controls": {
+      "ttl": {}
     }
+  }
+}
 ~~~~
 
 ### DNS record structure representation
@@ -158,33 +162,35 @@ A server MUST accept values as "@", "relative names" and fully qualified domain 
 Example:
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.1"
-          }
-        },
-        {
-          "name": "www",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.2"
-          }
-        },
-        {
-          "name": "web.example.com.",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.3"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
         }
-      ]
-    }
+      },
+      {
+        "name": "www",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.2"
+        }
+      },
+      {
+        "name": "web.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.3"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 The above example implies three resulting records:
@@ -222,50 +228,54 @@ Example:
 The resulting structure is therefore:
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "mx",
-          "rdata": {
-            "preference": "10",
-            "exchange": "mx1.example.net"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ]
-    }
+      },
+      {
+        "name": "@",
+        "type": "mx",
+        "rdata": {
+          "preference": "10",
+          "exchange": "mx1.example.net"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 ### Operational controls
 
-In addition to the regular data a server MAY allow clients to control specific operational behavior. A client MAY add an JSON object with a number of "dns_controls" to the domain object.
+In addition to the regular data a server MAY allow clients to control specific operational behavior. A client MAY extend the "dns" JSON object with a number of "controls".
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "<name>",
-          "type": "<type>",
-          "rdata": {
-            "rdata_key": "<rdata_value>"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "<name>",
+        "type": "<type>",
+        "rdata": {
+          "rdata_key": "<rdata_value>"
         }
-      ],
-      "dns_controls": {
-        "<named_control>": "<named_control_value>"
       }
+    ],
+    "controls": {
+      "<named_control>": "<named_control_value>"
     }
+  }
+}
 ~~~~
 
 ### Future DNS record types
@@ -283,65 +293,69 @@ In this delegation model the delegation information and corresponding DNS config
 A minimal delegation can be expressed by adding an array of name servers to the DNS data of a domain:
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns2.example.net."
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ]
-    }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns2.example.net."
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 If GLUE records are needed the client may add records of type "A" or "AAAA" :
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns.example.com"
-          }
-        },
-        {
-          "name": "ns.example.com.",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.1"
-          }
-        },
-        {
-          "name": "ns.example.com.",
-          "type": "aaaa",
-          "rdata": {
-            "address": "2001:DB8::1"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ]
-    }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns.example.com"
+        }
+      },
+      {
+        "name": "ns.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "ns.example.com.",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 ## Host Object
@@ -353,33 +367,35 @@ To enable specification of Host Objexts, similar to direct domain delegation, a 
 DNS configuration of Host Object is specified by NS, A and AAAA configuration within "dns" data structure:
 
 ~~~~ json
-    {
-      "@type": "Host",
-      "name": "ns.example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns.example.com"
-          }
-        },
-        {
-          "name": "ns.example.com.",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.1"
-          }
-        },
-        {
-          "name": "ns.example.com.",
-          "type": "aaaa",
-          "rdata": {
-            "address": "2001:DB8::1"
-          }
+{
+  "@type": "Host",
+  "name": "ns.example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns.example.com"
         }
-      ]
-    }
+      },
+      {
+        "name": "ns.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "ns.example.com.",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 ## DNSSEC
@@ -387,69 +403,73 @@ DNS configuration of Host Object is specified by NS, A and AAAA configuration wi
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns2.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ds",
-          "rdata": {
-            "key_tag": 12345,
-            "algorithm": 13,
-            "digest_type": 2,
-            "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ]
-    }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns2.example.net."
+        }
+      },
+      {
+        "name": "@",
+        "type": "ds",
+        "rdata": {
+          "key_tag": 12345,
+          "algorithm": 13,
+          "digest_type": 2,
+          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com.",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns2.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "dnskey",
-          "rdata": {
-            "flags": 257,
-            "protocol": 3,
-            "algorithm": 5,
-            "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com.",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ]
-    }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns2.example.net."
+        }
+      },
+      {
+        "name": "@",
+        "type": "dnskey",
+        "rdata": {
+          "flags": 257,
+          "protocol": 3,
+          "algorithm": 5,
+          "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+        }
+      }
+    ]
+  }
+}
 ~~~~
 
 ## Operational controls
@@ -458,83 +478,87 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
 
 The TTL controls the caching behavior of DNS resource records (see Section 5 of {{RFC9499}}). Typically a default TTL is defined by the registry operator. In some use cases it is desirable for a client to change the TTL value.
 
-A client MAY assign "ttl" to the dns_controls of an RR set which is intended to be present in the parent sides DNS. A server MAY ignore these values e.g. for policy reasons.
+A client MAY assign "ttl" to the controls of an RR set which is intended to be present in the parent sides DNS. A server MAY ignore these values e.g. for policy reasons.
 
 Example:
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "a",
-          "rdata": {
-            "address": "192.0.2.1"
-          }
-        },
-        {
-          "name": "@",
-          "type": "aaaa",
-          "rdata": {
-            "address": "2001:DB8::1"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
         }
-      ],
-      "dns_controls": {
-        "ttl": {
-          "a": 86400,
-          "aaaa": 3600
-       }
+      },
+      {
+        "name": "@",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
       }
+    ],
+    "controls": {
+      "ttl": {
+        "a": 86400,
+        "aaaa": 3600
     }
+    }
+  }
+}
 ~~~~
 
 ### Maximum signature lifetime
 
 Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record.
 
-A client MAY assign "maximum_signature_lifetime" to the dns_controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+A client MAY assign "maximum_signature_lifetime" to the controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
 
 Example:
 
 ~~~~ json
-    {
-      "@type": "Domain",
-      "name": "example.com",
-      "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns1.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns2.example.net."
-          }
-        },
-        {
-          "name": "@",
-          "type": "ds",
-          "rdata": {
-            "key_tag": 12345,
-            "algorithm": 13,
-            "digest_type": 2,
-            "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
-          }
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
         }
-      ],
-      "dns_controls": {
-        "maximum_signature_lifetime": {
-          "ds": 86400
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns2.example.net."
+        }
+      },
+      {
+        "name": "@",
+        "type": "ds",
+        "rdata": {
+          "key_tag": 12345,
+          "algorithm": 13,
+          "digest_type": 2,
+          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
+    ],
+    "controls": {
+      "maximum_signature_lifetime": {
+        "ds": 86400
+      }
     }
+  }
+}
 ~~~~
 
 ## Authoritative DNS data
@@ -545,66 +569,68 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 {
   "@type": "Domain",
   "name": "example.com",
-  "dns": [
-    {
-      "name": "@",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.1"
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "www.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "@",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
+      },
+      {
+        "name": "www.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
+      },
+      {
+        "name": "@",
+        "type": "mx",
+        "rdata": {
+          "preference": "10",
+          "exchange": "mx1.example.com"
+        }
+      },
+      {
+        "name": "mx1.example.com.",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.2"
+        }
+      },
+      {
+        "name": "@",
+        "type": "mx",
+        "rdata": {
+          "preference": "20",
+          "exchange": "mx2.example.net"
+        }
+      },
+      {
+        "name": "@",
+        "type": "txt",
+        "rdata": {
+          "txt_data": "v=spf1 -all"
+        }
       }
-    },
-    {
-      "name": "www.example.com.",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.1"
-      }
-    },
-    {
-      "name": "@",
-      "type": "aaaa",
-      "rdata": {
-        "address": "2001:DB8::1"
-      }
-    },
-    {
-      "name": "www.example.com.",
-      "type": "a",
-      "rdata": {
-        "address": "2001:DB8::1"
-      }
-    },
-    {
-      "name": "@",
-      "type": "mx",
-      "rdata": {
-        "preference": "10",
-        "exchange": "mx1.example.com"
-      }
-    },
-    {
-      "name": "mx1.example.com.",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.2"
-      }
-    },
-    {
-      "name": "@",
-      "type": "mx",
-      "rdata": {
-        "preference": "20",
-        "exchange": "mx2.example.net"
-      }
-    },
-    {
-      "name": "@",
-      "type": "txt",
-      "rdata": {
-        "txt_data": "v=spf1 -all"
-      }
-    }
-  ]
+    ]
+  }
 }
 ~~~~
 
@@ -613,8 +639,8 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
 The server MUST provide the following information per profile in the discovery document in section 10 of {{I-D.draft-ietf-rpp-requirements}}:
 
 * A list of supported resource record types
-* A list of applicable dns_controls
-* Minimum, maximum and default values for dns_controls
+* A list of applicable operational controls
+* Minimum, maximum and default values for operational controls
 
 TODO: Needs rewrite after definition of the discovery document
 
@@ -654,6 +680,7 @@ Deletion of a host name while still being referenced may lead to severe security
 
 ## -00 to -01
 
+- Combined structure for resource record definition and operational controls (Section 3.1.1)
 
 
 # IANA Considerations
@@ -722,59 +749,61 @@ RPP JSON representation:
   "@type": "Domain",
   "name": "example.com",
   "...": "",
-  "dns": [
-    {
-      "name": "@",
-      "type": "ns",
-      "rdata": {
-        "nsdname": "ns1.example.com"
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.com"
+        }
+      },
+      {
+        "name": "ns1.example.com",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "ns1.example.com",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:db8::1"
+        }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns2.example.com"
+        }
+      },
+      {
+        "name": "ns2.example.com",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.2"
+        }
+      },
+      {
+        "name": "@",
+        "type": "ds",
+        "rdata": {
+          "key_tag": 12345,
+          "algorithm": 13,
+          "digest_type": 2,
+          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+        }
       }
-    },
-    {
-      "name": "ns1.example.com",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.1"
+    ],
+    "controls": {
+      "maximum_signature_lifetime": {
+        "ds": 604800
+      },
+      "ttl": {
+        "ns": 3600
       }
-    },
-    {
-      "name": "ns1.example.com",
-      "type": "aaaa",
-      "rdata": {
-        "address": "2001:db8::1"
-      }
-    },
-    {
-      "name": "@",
-      "type": "ns",
-      "rdata": {
-        "nsdname": "ns2.example.com"
-      }
-    },
-    {
-      "name": "ns2.example.com",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.2"
-      }
-    },
-    {
-      "name": "@",
-      "type": "ds",
-      "rdata": {
-        "key_tag": 12345,
-        "algorithm": 13,
-        "digest_type": 2,
-        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
-      }
-    }
-  ],
-  "dns_controls": {
-    "maximum_signature_lifetime": {
-      "ds": 604800
-    },
-    "ttl": {
-      "ns": 3600
     }
   }
 }
@@ -845,24 +874,26 @@ RPP JSON representation:
       }
     ]
   },
-  "dns": [
-    {
-      "name": "@",
-      "type": "ds",
-      "rdata": {
-        "key_tag": 12345,
-        "algorithm": 13,
-        "digest_type": 2,
-        "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ds",
+        "rdata": {
+          "key_tag": 12345,
+          "algorithm": 13,
+          "digest_type": 2,
+          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+        }
       }
-    }
-  ],
-  "dns_controls": {
-    "maximum_signature_lifetime": {
-      "ds": 604800
-    },
-    "ttl": {
-      "ns": 3600
+    ],
+    "controls": {
+      "maximum_signature_lifetime": {
+        "ds": 604800
+      },
+      "ttl": {
+        "ns": 3600
+      }
     }
   }
 }
@@ -894,39 +925,41 @@ RPP JSON representation:
 
 ~~~~ json
 {
-    "@type": "Host",
-    "...": "",
-    "name": "ns1.example.com",
-    "dns": [
-        {
-          "name": "@",
-          "type": "ns",
-          "rdata": {
-            "nsdname": "ns.example.com"
-          }
-        },
-        {
-            "name": "@",
-            "type": "a",
-            "rdata": {
-                "address": "192.0.2.2"
-            }
-        },
-        {
-            "name": "@",
-            "type": "a",
-            "rdata": {
-                "address": "192.0.2.29"
-            }
-        },
-        {
-            "name": "@",
-            "type": "aaaa",
-            "rdata": {
-                "address": "1080:0:0:0:8:800:200C:417A"
-            }
+  "@type": "Host",
+  "...": "",
+  "name": "ns1.example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns.example.com"
         }
+      },
+      {
+          "name": "@",
+          "type": "a",
+          "rdata": {
+              "address": "192.0.2.2"
+          }
+      },
+      {
+          "name": "@",
+          "type": "a",
+          "rdata": {
+              "address": "192.0.2.29"
+          }
+      },
+      {
+          "name": "@",
+          "type": "aaaa",
+          "rdata": {
+              "address": "1080:0:0:0:8:800:200C:417A"
+          }
+      }
     ]
+  }
 }
 ~~~~
 
@@ -1080,39 +1113,41 @@ RPP JSON representation:
   "@type": "Domain",
   "name": "example.de",
   "...": "",
-  "dns": [
-    {
-      "name": "@",
-      "type": "ns",
-      "rdata": {
-        "nsdname": "ns1.example.com"
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.com"
+        }
+      },
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.de"
+        }
+      },
+      {
+        "name": "ns1.example.de",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      },
+      {
+        "name": "@",
+        "type": "dnskey",
+        "rdata": {
+          "flags": 257,
+          "protocol": 3,
+          "algorithm": 5,
+          "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+        }
       }
-    },
-    {
-      "name": "@",
-      "type": "ns",
-      "rdata": {
-        "nsdname": "ns1.example.de"
-      }
-    },
-    {
-      "name": "ns1.example.de",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.1"
-      }
-    },
-    {
-      "name": "@",
-      "type": "dnskey",
-      "rdata": {
-        "flags": 257,
-        "protocol": 3,
-        "algorithm": 5,
-        "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
-      }
-    }
-  ]
+    ]
+  }
 }
 ~~~~
 
@@ -1146,16 +1181,18 @@ RPP JSON representation:
 {
   "@type": "Domain",
   "name": "example.de",
-    "...": "",
-  "dns": [
-    {
-      "name": "@",
-      "type": "a",
-      "rdata": {
-        "address": "192.0.2.1"
+  "...": "",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ~~~~
 
