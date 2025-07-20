@@ -11,7 +11,7 @@ display_help() {
 
 # Check if a parameter is provided
 if [ -z "$1" ]; then
-    filename=`find . -name 'draft-*.md' | sed 's/.md$//' | tr -d './'`
+    filename=`find . -maxdepth 1 -name 'draft-*.md' | sed 's/.md$//' | tr -d './'`
     echo "warning: using default filename: $filename" >&2
 else
     filename="$1"
