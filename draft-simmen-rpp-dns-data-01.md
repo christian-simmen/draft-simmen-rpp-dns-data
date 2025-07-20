@@ -123,7 +123,7 @@ RDATA     The actual payload data. Structures defer for each type.
 ## Rules
 
 ### DNS data extending an domain object
-Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an "dns" object having an array of DNS "records" and a facility for signaling parameters to "control" operational behavior. The top level format of a DNS resource record as described in section 3.2.1 of {{RFC1035}} is converted into properties. Keys MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter.
+Delegation data, as well as DNSSEC data, is intended to find it's way into the parent side DNS servers. Because of the strong connection to the provisioned domain object and DNS servers both aspects should be visible in the RPP data model. Therefore the domain object is extended by an "dns" object having an array of DNS "records" and a facility for signaling parameters to "control" operational behavior. The top level format of a DNS resource record as described in section 3.2.1 of {{RFC1035}} is converted into properties. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter.
 
 ~~~~ json
 {
@@ -218,7 +218,7 @@ RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A c
 
 #### rdata
 
-The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be translated to lowercase. Whitespaces MUST be translated to underscores ("_").
+The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter.
 
 Example:
 
@@ -267,12 +267,12 @@ In addition to the regular data a server MAY allow clients to control specific o
         "name": "<name>",
         "type": "<type>",
         "rdata": {
-          "rdata_key": "<rdata_value>"
+          "rdataKey": "<rdataValue>"
         }
       }
     ],
     "controls": {
-      "<named_control>": "<named_control_value>"
+      "<namedControl>": "<namedControlValue>"
     }
   }
 }
@@ -426,9 +426,9 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
         "name": "@",
         "type": "ds",
         "rdata": {
-          "key_tag": 12345,
+          "keyTag": 12345,
           "algorithm": 13,
-          "digest_type": 2,
+          "digestType": 2,
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -464,7 +464,7 @@ To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or
           "flags": 257,
           "protocol": 3,
           "algorithm": 5,
-          "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+          "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
         }
       }
     ]
@@ -515,9 +515,9 @@ Example:
 
 ### Maximum signature lifetime
 
-Maximum signature lifetime (maximum_signature_lifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximum_signature_lifetime value applies to the RRSIG resource record over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record.
+Maximum signature lifetime (maximumSignatureLifetime) describes the maximum number of seconds after signature generation a parents signature on signed DNS information should expire. The maximumSignatureLifetime value applies to the RRSIG resource record over the signed DNS RR. See Section 3 of {{RFC4034}} for information on the RRSIG resource record.
 
-A client MAY assign "maximum_signature_lifetime" to the controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
+A client MAY assign "maximumSignatureLifetime" to the controls of an RR set which is intended to be signed on the parent side. A server MAY ignore these values, e.g. for policy reasons.
 
 Example:
 
@@ -545,15 +545,15 @@ Example:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "key_tag": 12345,
+          "keyTag": 12345,
           "algorithm": 13,
-          "digest_type": 2,
+          "digestType": 2,
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
     ],
     "controls": {
-      "maximum_signature_lifetime": {
+      "maximumSignatureLifetime": {
         "ds": 86400
       }
     }
@@ -626,7 +626,7 @@ A server MAY support additional RR types, e.g. to support delegation-less provis
         "name": "@",
         "type": "txt",
         "rdata": {
-          "txt_data": "v=spf1 -all"
+          "txtData": "v=spf1 -all"
         }
       }
     ]
@@ -681,6 +681,7 @@ Deletion of a host name while still being referenced may lead to severe security
 ## -00 to -01
 
 - Combined structure for resource record definition and operational controls (Section 3.1.1)
+- Use camel case for property names instead of snake case
 
 
 # IANA Considerations
@@ -790,15 +791,15 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "key_tag": 12345,
+          "keyTag": 12345,
           "algorithm": 13,
-          "digest_type": 2,
+          "digestType": 2,
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
         }
       }
     ],
     "controls": {
-      "maximum_signature_lifetime": {
+      "maximumSignatureLifetime": {
         "ds": 604800
       },
       "ttl": {
@@ -880,15 +881,15 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "key_tag": 12345,
+          "keyTag": 12345,
           "algorithm": 13,
-          "digest_type": 2,
+          "digestType": 2,
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
     ],
     "controls": {
-      "maximum_signature_lifetime": {
+      "maximumSignatureLifetime": {
         "ds": 604800
       },
       "ttl": {
@@ -1143,7 +1144,7 @@ RPP JSON representation:
           "flags": 257,
           "protocol": 3,
           "algorithm": 5,
-          "public_key": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+          "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
         }
       }
     ]
