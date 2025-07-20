@@ -650,6 +650,11 @@ are references to a host name outside of the registry. E.g. "ns.example.net" is 
 
 Deletion of a host name while still being referenced may lead to severe security risks for the referencing domain.
 
+# Change History
+
+## -00 to -01
+
+
 
 # IANA Considerations
 
