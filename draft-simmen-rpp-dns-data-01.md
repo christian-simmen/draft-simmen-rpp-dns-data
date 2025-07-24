@@ -267,7 +267,7 @@ In addition to the regular data a server MAY allow clients to control specific o
         "name": "<name>",
         "type": "<type>",
         "rdata": {
-          "rdataKey": "<rdataValue>"
+          "<rdataKey>": "<rdataValue>"
         }
       }
     ],
