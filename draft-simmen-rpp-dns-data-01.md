@@ -71,7 +71,6 @@ normative:
   RFC9083:
 
 informative:
-  RFC7477:
   RFC8484:
   RFC9250:
   RFC9460:
