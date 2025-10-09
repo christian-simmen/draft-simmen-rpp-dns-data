@@ -1131,28 +1131,6 @@ RDAP JSON:
 }
 ~~~~
 
-## CSYNC ({{RFC7477}})
-
-~~~~ json
-{
-  "@type": "Domain",
-  "name": "example.com.",
-  "dns": {
-    "records": [
-      {
-        "name": "@",
-        "type": "csync",
-        "rdata": {
-          "soaSerial": 1759953264,
-          "flags": 3,
-          "typeBitMap": "A NS AAAA"
-        }
-      }
-    ]
-  }
-}
-~~~~
-
 ## DNSKEY ({{RFC4034}})
 
 ~~~~ json
