@@ -444,9 +444,9 @@ Example:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -621,9 +621,9 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
         }
       }
@@ -711,9 +711,9 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -971,9 +971,9 @@ RPP JSON representation:
         "name": "@",
         "type": "dnskey",
         "rdata": {
-          "flags": 257,
-          "protocol": 3,
-          "algorithm": 5,
+          "flags": "257",
+          "protocol": "3",
+          "algorithm": "5",
           "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
         }
       }
@@ -1143,9 +1143,9 @@ RDAP JSON:
         "name": "@",
         "type": "dnskey",
         "rdata": {
-          "flags": 257,
-          "protocol": 3,
-          "algorithm": 5,
+          "flags": "257",
+          "protocol": "3",
+          "algorithm": "5",
           "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
         }
       }
@@ -1166,9 +1166,9 @@ RDAP JSON:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -1228,9 +1228,9 @@ RDAP JSON:
     "records": [
       {
         "name": "@",
-        "type": "SVCB",
+        "type": "svcb",
         "rdata": {
-          "svcPriority": 10,
+          "svcPriority": "10",
           "targetName": "svc.example.com",
           "svcParams": {
             "ipv4hint": "192.0.2.1",
