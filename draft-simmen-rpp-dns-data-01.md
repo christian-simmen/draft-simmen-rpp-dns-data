@@ -71,8 +71,10 @@ normative:
   RFC9083:
 
 informative:
+  RFC8259:
   RFC8484:
   RFC9250:
+  RFC9460:
   RFC9499:
   I-D.draft-ietf-deleg:
   I-D.draft-ietf-rpp-requirements:
@@ -218,40 +220,7 @@ RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A c
 
 #### rdata
 
-The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA described by the corresponding RFC. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter.
-
-Example:
-
-* Section 3.3.11 (NS RDATA format) of {{RFC1035}} describes the RDATA of a NS RR having a field named "NSDNAME".
-* Section 3.3.9 (MX RDATA format) of {{RFC1035}} describes the RDATA of a MX RR having the field named "PREFERENCE", "EXCHANGE".
-
-The resulting structure is therefore:
-
-~~~~ json
-{
-  "@type": "Domain",
-  "name": "example.com",
-  "dns": {
-    "records": [
-      {
-        "name": "@",
-        "type": "ns",
-        "rdata": {
-          "nsdname": "ns1.example.net."
-        }
-      },
-      {
-        "name": "@",
-        "type": "mx",
-        "rdata": {
-          "preference": "10",
-          "exchange": "mx1.example.net"
-        }
-      }
-    ]
-  }
-}
-~~~~
+The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA presentation format described by the corresponding RFC. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter. All property values MUST be represented as {{RFC8259}} JSON Strings and encode presentation format of the value.
 
 ### Operational controls
 
@@ -402,76 +371,6 @@ DNS configuration of Host Object is specified by NS, A and AAAA configuration wi
 
 To enable DNSSEC provisioning a server SHOULD support either "DS" or "DNSKEY" or both record types. The records MUST be added to the "dns" array of the domain. If provided with only "DNSKEY" a server MUST calculate the DS record. If both record types are provided a server MAY use the DNSKEY to validate the DS record.
 
-~~~~ json
-{
-  "@type": "Domain",
-  "name": "example.com",
-  "dns": {
-    "records": [
-      {
-        "name": "@",
-        "type": "ns",
-        "rdata": {
-          "nsdname": "ns1.example.net."
-        }
-      },
-      {
-        "name": "@",
-        "type": "ns",
-        "rdata": {
-          "nsdname": "ns2.example.net."
-        }
-      },
-      {
-        "name": "@",
-        "type": "ds",
-        "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
-          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
-        }
-      }
-    ]
-  }
-}
-~~~~
-
-~~~~ json
-{
-  "@type": "Domain",
-  "name": "example.com.",
-  "dns": {
-    "records": [
-      {
-        "name": "@",
-        "type": "ns",
-        "rdata": {
-          "nsdname": "ns1.example.net."
-        }
-      },
-      {
-        "name": "@",
-        "type": "ns",
-        "rdata": {
-          "nsdname": "ns2.example.net."
-        }
-      },
-      {
-        "name": "@",
-        "type": "dnskey",
-        "rdata": {
-          "flags": 257,
-          "protocol": 3,
-          "algorithm": 5,
-          "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
-        }
-      }
-    ]
-  }
-}
-~~~~
-
 ## Operational controls
 
 ### TTL
@@ -545,9 +444,9 @@ Example:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -564,75 +463,6 @@ Example:
 ## Authoritative DNS data
 
 A server MAY support additional RR types, e.g. to support delegation-less provisioning. By doing this the registry operators name servers becomes authoritative for the registered domain. A server MUST consider resource records designed for delegation - including DNSSEC - and resource records representing authoritative data - except for GLUE RR - mutual exclusive.
-
-~~~~ json
-{
-  "@type": "Domain",
-  "name": "example.com",
-  "dns": {
-    "records": [
-      {
-        "name": "@",
-        "type": "a",
-        "rdata": {
-          "address": "192.0.2.1"
-        }
-      },
-      {
-        "name": "www.example.com.",
-        "type": "a",
-        "rdata": {
-          "address": "192.0.2.1"
-        }
-      },
-      {
-        "name": "@",
-        "type": "aaaa",
-        "rdata": {
-          "address": "2001:DB8::1"
-        }
-      },
-      {
-        "name": "www.example.com.",
-        "type": "a",
-        "rdata": {
-          "address": "2001:DB8::1"
-        }
-      },
-      {
-        "name": "@",
-        "type": "mx",
-        "rdata": {
-          "preference": "10",
-          "exchange": "mx1.example.com"
-        }
-      },
-      {
-        "name": "mx1.example.com.",
-        "type": "a",
-        "rdata": {
-          "address": "192.0.2.2"
-        }
-      },
-      {
-        "name": "@",
-        "type": "mx",
-        "rdata": {
-          "preference": "20",
-          "exchange": "mx2.example.net"
-        }
-      },
-      {
-        "name": "@",
-        "type": "txt",
-        "rdata": {
-          "txtData": "v=spf1 -all"
-        }
-      }
-    ]
-  }
-}
-~~~~
 
 # Discoverability
 
@@ -680,9 +510,10 @@ Deletion of a host name while still being referenced may lead to severe security
 
 ## -00 to -01
 
-- Combined structure for resource record definition and operational controls (Section 3.1.1)
-- Use camel case for property names instead of snake case
-
+- Combined structure for resource record definition and operational controls (Section 3.1.1).
+- Use camel case for property names instead of snake case.
+- Move examples or RR types to Appendix B.
+- Clarification tha RDATA presentation format is used. Datatypes for property values in RDATA are set to string.
 
 # IANA Considerations
 
@@ -791,9 +622,9 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
         }
       }
@@ -881,9 +712,9 @@ RPP JSON representation:
         "name": "@",
         "type": "ds",
         "rdata": {
-          "keyTag": 12345,
-          "algorithm": 13,
-          "digestType": 2,
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
         }
       }
@@ -1141,9 +972,9 @@ RPP JSON representation:
         "name": "@",
         "type": "dnskey",
         "rdata": {
-          "flags": 257,
-          "protocol": 3,
-          "algorithm": 5,
+          "flags": "257",
+          "protocol": "3",
+          "algorithm": "5",
           "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
         }
       }
@@ -1256,6 +1087,180 @@ RDAP JSON:
     }
   ],
   "status": ["active"]
+}
+~~~~
+
+# Appendix B. Example Structures for RR Types
+
+## A ({{RFC1035}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "a",
+        "rdata": {
+          "address": "192.0.2.1"
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## AAAA ({{RFC3596}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "ns.example.com.",
+        "type": "aaaa",
+        "rdata": {
+          "address": "2001:DB8::1"
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## DNSKEY ({{RFC4034}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com.",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "dnskey",
+        "rdata": {
+          "flags": "257",
+          "protocol": "3",
+          "algorithm": "5",
+          "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## DS ({{RFC4034}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ds",
+        "rdata": {
+          "keyTag": "12345",
+          "algorithm": "13",
+          "digestType": "2",
+          "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## NS ({{RFC1035}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "ns",
+        "rdata": {
+          "nsdname": "ns1.example.net."
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## MX ({{RFC1035}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "mx",
+        "rdata": {
+          "preference": "10",
+          "exchange": "mx1.example.net"
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## SVCB ({{RFC9460}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "svcb",
+        "rdata": {
+          "svcPriority": "10",
+          "targetName": "svc.example.com",
+          "svcParams": {
+            "ipv4hint": "192.0.2.1",
+            "ipv6hint": "2001:DB8::1"
+          }
+        }
+      }
+    ]
+  }
+}
+~~~~
+
+## TXT ({{RFC1035}})
+
+~~~~ json
+{
+  "@type": "Domain",
+  "name": "example.com",
+  "dns": {
+    "records": [
+      {
+        "name": "@",
+        "type": "txt",
+        "rdata": {
+          "txtData": "v=spf1 -all"
+        }
+      }
+    ]
+  }
 }
 ~~~~
 
