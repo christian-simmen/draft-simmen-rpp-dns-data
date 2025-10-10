@@ -71,6 +71,7 @@ normative:
   RFC9083:
 
 informative:
+  RFC8259:
   RFC8484:
   RFC9250:
   RFC9460:
@@ -219,7 +220,7 @@ RDLENGTH specifies the length of the RDATA field and will be ignored in RPP. A c
 
 #### rdata
 
-The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA presentation format described by the corresponding RFC. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter. Property values shall be strings.
+The RDATA structure depends on the TYPE and MUST be expressed as a JSON object. Property names MUST follow the definition of the RDATA presentation format described by the corresponding RFC. Property names MUST be written in camel case, generally using lower case letters, removing whitespaces and starting subsequent words with a capital letter. All property values MUST be represented as {{RFC8259}} JSON Strings and encode presentation format of the value.
 
 ### Operational controls
 
@@ -512,7 +513,7 @@ Deletion of a host name while still being referenced may lead to severe security
 - Combined structure for resource record definition and operational controls (Section 3.1.1).
 - Use camel case for property names instead of snake case.
 - Move examples or RR types to Appendix B.
-- Clarification tha RDATA presentation format is used. Therefroe datatypes for values in RDATA are set to string.
+- Clarification tha RDATA presentation format is used. Datatypes for property values in RDATA are set to string.
 
 # IANA Considerations
 
