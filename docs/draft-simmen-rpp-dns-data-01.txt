@@ -1,0 +1,2016 @@
+
+
+
+
+rpp                                                            C. Simmen
+Internet-Draft                                                P. Kowalik
+Intended status: Informational                                  DENIC eG
+Expires: 23 April 2026                                   20 October 2025
+
+
+ DNS data representation for use in RESTful Provisioning Protocol (RPP)
+                      draft-simmen-rpp-dns-data-01
+
+Abstract
+
+   This document proposes a unified, extensible JSON representation for
+   DNS resource records for use in the RESTful Provisioning Protocol
+   (RPP).  The aim is to create a single, consistent structure for
+   provisioning all DNS-related data - including delegation, DNSSEC, and
+   other record types - that directly mirrors the DNS data model and
+   being mappable to existing EPP model of requests and responses same
+   time.  This approach simplifies the adoption of both current and
+   future DNS features by aligning the provisioning format with the
+   target system, thereby streamlining the management of domain names
+   and related objects within RPP.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://github.com/
+   christian-simmen/draft-simmen-rpp-dns-data.  Status information for
+   this document may be found at https://datatracker.ietf.org/doc/draft-
+   simmen-rpp-dns-data/.
+
+   Discussion of this document takes place on the WG Working Group
+   mailing list (mailto:rpp@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/rpp/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/rpp/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/christian-simmen/draft-simmen-rpp-dns-data.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 1]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 23 April 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Domain Names in DNS . . . . . . . . . . . . . . . . . . . . .   4
+   3.  JSON representation . . . . . . . . . . . . . . . . . . . . .   5
+     3.1.  Rules . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+       3.1.1.  DNS data extending an domain object . . . . . . . . .   5
+       3.1.2.  DNS record structure representation . . . . . . . . .   5
+       3.1.3.  Operational controls  . . . . . . . . . . . . . . . .   7
+       3.1.4.  Future DNS record types . . . . . . . . . . . . . . .   8
+   4.  Use cases . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     4.1.  Domain delegation (Host Attribute)  . . . . . . . . . . .   8
+     4.2.  Host Object . . . . . . . . . . . . . . . . . . . . . . .  10
+     4.3.  DNSSEC  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     4.4.  Operational controls  . . . . . . . . . . . . . . . . . .  11
+       4.4.1.  TTL . . . . . . . . . . . . . . . . . . . . . . . . .  12
+       4.4.2.  Maximum signature lifetime  . . . . . . . . . . . . .  13
+     4.5.  Authoritative DNS data  . . . . . . . . . . . . . . . . .  14
+   5.  Discoverability . . . . . . . . . . . . . . . . . . . . . . .  15
+   6.  EPP compatibility considerations  . . . . . . . . . . . . . .  15
+   7.  Conventions and Definitions . . . . . . . . . . . . . . . . .  15
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
+     8.1.  Authoritative data  . . . . . . . . . . . . . . . . . . .  15
+     8.2.  Host references within the rdata field  . . . . . . . . .  15
+   9.  Change History  . . . . . . . . . . . . . . . . . . . . . . .  16
+     9.1.  -00 to -01  . . . . . . . . . . . . . . . . . . . . . . .  16
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 2]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   11. Appendix A.  Examples from current implementations  . . . . .  16
+     11.1.  EPP  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+       11.1.1.  Create domain using host attributes example  . . . .  16
+       11.1.2.  Create domain using host object example  . . . . . .  19
+       11.1.3.  Create host object example . . . . . . . . . . . . .  21
+     11.2.  Free Registry for ENUM and Domains (FRED)  . . . . . . .  23
+       11.2.1.  Create domain example  . . . . . . . . . . . . . . .  23
+       11.2.2.  Create nsset example . . . . . . . . . . . . . . . .  24
+       11.2.3.  Create keyset example  . . . . . . . . . . . . . . .  24
+     11.3.  Realtime Registry Interface (RRI)  . . . . . . . . . . .  25
+       11.3.1.  Create domain with name servers example  . . . . . .  25
+       11.3.2.  Create domain without delegation example . . . . . .  27
+     11.4.  RDAP . . . . . . . . . . . . . . . . . . . . . . . . . .  28
+       11.4.1.  Domain object  . . . . . . . . . . . . . . . . . . .  28
+   12. Appendix B.  Example Structures for RR Types  . . . . . . . .  30
+     12.1.  A (RFC1035)  . . . . . . . . . . . . . . . . . . . . . .  30
+     12.2.  AAAA (RFC3596) . . . . . . . . . . . . . . . . . . . . .  30
+     12.3.  DNSKEY (RFC4034) . . . . . . . . . . . . . . . . . . . .  30
+     12.4.  DS (RFC4034) . . . . . . . . . . . . . . . . . . . . . .  31
+     12.5.  NS (RFC1035) . . . . . . . . . . . . . . . . . . . . . .  31
+     12.6.  MX (RFC1035) . . . . . . . . . . . . . . . . . . . . . .  32
+     12.7.  SVCB (RFC9460) . . . . . . . . . . . . . . . . . . . . .  32
+     12.8.  TXT (RFC1035)  . . . . . . . . . . . . . . . . . . . . .  33
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  33
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  33
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  34
+   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  35
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
+
+1.  Introduction
+
+   The Extensible Provisioning Protocol (EPP) manages DNS delegation
+   data using distinct object types and extensions.  Host Objects
+   [RFC5732] are used for name servers (NS records) and their associated
+   addresses (glue A/AAAA records), while DNSSEC data is handled via a
+   separate security extension [RFC5910].  Name server information can
+   be also directly attached to a domain name as a set of Host
+   Attributes [RFC5731].  More recently, control over Time-to-Live (TTL)
+   values was added through another extension [RFC9803].
+
+   While functional, this segmented approach creates complexity.  The
+   DNS landscape itself is evolving, with new transport protocols like
+   DNS-over-HTTPS [RFC8484] and DNS-over-QUIC [RFC9250] driving the need
+   for more sophisticated delegation information, such as the proposed
+   DELEG record type [I-D.draft-ietf-deleg].
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 3]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   Some registry operators have developed their own proprietary
+   solutions.  These include grouping name servers into "sets" for
+   easier management or allowing domains to be provisioned with
+   arbitrary DNS resource records (RR) without formal delegation, which
+   is expanding on Host Attribute model with other resource record
+   types.
+
+   The development of the RESTful Provisioning Protocol (RPP) provides
+   an opportunity to address this fragmentation.  This document proposes
+   a unified data representation for all DNS-related information,
+   specified in a format that directly mirrors DNS resource records.
+   This approach is not intended to influence existing registry data
+   models, but rather to offer a flexible and consistent structure for
+   the data in the protocol.  By unifying the representation of
+   delegation data (NS, A/AAAA glue), DNSSEC information, and other
+   record types, this model can be applied across various contexts.  It
+   is designed to be equally applicable whether a registry uses separate
+   host objects, host attributes within a domain, or more abstract
+   concepts like name server sets, thereby simplifying implementation
+   and ensuring adaptability for future developments in the DNS.
+
+2.  Domain Names in DNS
+
+   DNS domain names are hierarchically ordered label separated by a dot
+   ".".  Each label represent the delegation of a subordinate namespace
+   or a host name.  DNS resource records [RFC1035] are expressed as a
+   dataset containing:
+
+   "NAME" "CLASS" "TYPE" "TTL" "RDLENGTH" "RDATA"
+
+   A set of resource records describes the behavior of a namespace.
+   Each resource record shares the same top level format.
+
+   NAME The owner name of the DNS entry which MAY be the domain itself
+   or a subordinate hostname.
+
+   CLASS The RR CLASS
+
+   TYPE The RR TYPE of data present in the RDATA field.
+
+   TTL Time interval a RR may be cached by name servers
+
+   RDLENGTH The length of the RDATA field.  RDLENGTH will be safely
+   ignored in RPP
+
+   RDATA The actual payload data.  Structures defer for each type.
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 4]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+3.  JSON representation
+
+3.1.  Rules
+
+3.1.1.  DNS data extending an domain object
+
+   Delegation data, as well as DNSSEC data, is intended to find it's way
+   into the parent side DNS servers.  Because of the strong connection
+   to the provisioned domain object and DNS servers both aspects should
+   be visible in the RPP data model.  Therefore the domain object is
+   extended by an "dns" object having an array of DNS "records" and a
+   facility for signaling parameters to "control" operational behavior.
+   The top level format of a DNS resource record as described in section
+   3.2.1 of [RFC1035] is converted into properties.  Property names MUST
+   be written in camel case, generally using lower case letters,
+   removing whitespaces and starting subsequent words with a capital
+   letter.
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "",
+           "class": "",
+           "type": "",
+           "rdata": {}
+         }
+       ],
+       "controls": {
+         "ttl": {}
+       }
+     }
+   }
+
+3.1.2.  DNS record structure representation
+
+3.1.2.1.  name
+
+   The owner name of the DNS entry which MAY be the domain itself or a
+   subordinate hostname.  A server MUST NOT accept a NAME which is not a
+   subordinate label to the provisioned domain name.
+
+   A server MUST accept values as "@", "relative names" and fully
+   qualified domain names (FQDN).
+
+   "@" MUST be interpreted as the provisioned domain name.
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 5]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   "relative names" MUST be appended by the server with the provisioned
+   domain name.
+
+   "FQDN" identified by a trailing dot (".") MUST NOT be interpreted by
+   the server.  A server MUST check if the provided name is a
+   subordinate to the provisioned domain, or the domain itself.
+
+   Example:
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "www",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.2"
+           }
+         },
+         {
+           "name": "web.example.com.",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.3"
+           }
+         }
+       ]
+     }
+   }
+
+   The above example implies three resulting records:
+
+   *  An "A" RR for "example.com" ("@") set to 192.0.2.1.
+
+   *  An "A" RR for "www.example.com" ("www" relative) set to 192.0.2.2.
+
+   *  An "A" RR for "web.example.com" (FQDN) set to 192.0.2.3.
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 6]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+3.1.2.2.  class
+
+   A client SHOULD omit the class.  The server MUST assume "IN" as class
+   of a transferred dataset and MAY decline other values.  If present
+   the value MUST be chosen from section 3.2.4.  (CLASS values) of
+   [RFC1035].
+
+3.1.2.3.  type
+
+   The TYPE of data present in the RDATA.  This also implies the
+   expected fields in RDATA.  If present the value MUST chosen from
+   section 3.2.2.  (TYPE values) of [RFC1035] or other RFC describing
+   the RR type.  Values MUST be converted to lower case.
+
+3.1.2.4.  ttl
+
+   TTL is considered a operational control (see section 3.1.3 and
+   section 4.3.1 of this document).  A server MUST set a default value
+   as TTL and MAY ignore other values send by a client.
+
+3.1.2.5.  rdlength
+
+   RDLENGTH specifies the length of the RDATA field and will be ignored
+   in RPP.  A client MUST NOT include this field.  A server MUST ignore
+   this field if present.
+
+3.1.2.6.  rdata
+
+   The RDATA structure depends on the TYPE and MUST be expressed as a
+   JSON object.  Property names MUST follow the definition of the RDATA
+   presentation format described by the corresponding RFC.  Property
+   names MUST be written in camel case, generally using lower case
+   letters, removing whitespaces and starting subsequent words with a
+   capital letter.  All property values MUST be represented as [RFC8259]
+   JSON Strings and encode presentation format of the value.
+
+3.1.3.  Operational controls
+
+   In addition to the regular data a server MAY allow clients to control
+   specific operational behavior.  A client MAY extend the "dns" JSON
+   object with a number of "controls".
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 7]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "<name>",
+           "type": "<type>",
+           "rdata": {
+             "<rdataKey>": "<rdataValue>"
+           }
+         }
+       ],
+       "controls": {
+         "<namedControl>": "<namedControlValue>"
+       }
+     }
+   }
+
+3.1.4.  Future DNS record types
+
+   With respect to an evolving DNS landscape new record types -
+   including delegation - may emerge.  Usually these record type will be
+   defined and standardized for the DNS in first.  Adopting future
+   record types MUST be done using the rules described in section
+   3.1.2.6 of this document.
+
+4.  Use cases
+
+4.1.  Domain delegation (Host Attribute)
+
+   To enable domain delegation a server MUST support the "NS", "A" and
+   "AAAA" record types ([RFC1035], [RFC3596]).
+
+   In this delegation model the delegation information and corresponding
+   DNS configuration is attached directly to a domain object.  This is
+   corresponding to Host Attribute delegation model of [RFC5731].
+
+   A minimal delegation can be expressed by adding an array of name
+   servers to the DNS data of a domain:
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 8]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.net."
+           }
+         },
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns2.example.net."
+           }
+         }
+       ]
+     }
+   }
+
+   If GLUE records are needed the client may add records of type "A" or
+   "AAAA" :
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                 [Page 9]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.net."
+           }
+         },
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns.example.com"
+           }
+         },
+         {
+           "name": "ns.example.com.",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "ns.example.com.",
+           "type": "aaaa",
+           "rdata": {
+             "address": "2001:DB8::1"
+           }
+         }
+       ]
+     }
+   }
+
+4.2.  Host Object
+
+   [RFC5731] specifies how domain delegation can be expressed as a
+   relation to a separate provisioning object (Host Object), which
+   carries the DNS configuration (name and glue records), with details
+   specified in [RFC5732].
+
+   To enable specification of Host Objexts, similar to direct domain
+   delegation, a server MUST support the "NS", "A" and "AAAA" record
+   types ([RFC1035], [RFC3596]).
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 10]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   DNS configuration of Host Object is specified by NS, A and AAAA
+   configuration within "dns" data structure:
+
+   {
+     "@type": "Host",
+     "name": "ns.example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns.example.com"
+           }
+         },
+         {
+           "name": "ns.example.com.",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "ns.example.com.",
+           "type": "aaaa",
+           "rdata": {
+             "address": "2001:DB8::1"
+           }
+         }
+       ]
+     }
+   }
+
+4.3.  DNSSEC
+
+   To enable DNSSEC provisioning a server SHOULD support either "DS" or
+   "DNSKEY" or both record types.  The records MUST be added to the
+   "dns" array of the domain.  If provided with only "DNSKEY" a server
+   MUST calculate the DS record.  If both record types are provided a
+   server MAY use the DNSKEY to validate the DS record.
+
+4.4.  Operational controls
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 11]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+4.4.1.  TTL
+
+   The TTL controls the caching behavior of DNS resource records (see
+   Section 5 of [RFC9499]).  Typically a default TTL is defined by the
+   registry operator.  In some use cases it is desirable for a client to
+   change the TTL value.
+
+   A client MAY assign "ttl" to the controls of an RR set which is
+   intended to be present in the parent sides DNS.  A server MAY ignore
+   these values e.g. for policy reasons.
+
+   Example:
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "@",
+           "type": "aaaa",
+           "rdata": {
+             "address": "2001:DB8::1"
+           }
+         }
+       ],
+       "controls": {
+         "ttl": {
+           "a": 86400,
+           "aaaa": 3600
+       }
+       }
+     }
+   }
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 12]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+4.4.2.  Maximum signature lifetime
+
+   Maximum signature lifetime (maximumSignatureLifetime) describes the
+   maximum number of seconds after signature generation a parents
+   signature on signed DNS information should expire.  The
+   maximumSignatureLifetime value applies to the RRSIG resource record
+   over the signed DNS RR.  See Section 3 of [RFC4034] for information
+   on the RRSIG resource record.
+
+   A client MAY assign "maximumSignatureLifetime" to the controls of an
+   RR set which is intended to be signed on the parent side.  A server
+   MAY ignore these values, e.g. for policy reasons.
+
+   Example:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 13]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.net."
+           }
+         },
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns2.example.net."
+           }
+         },
+         {
+           "name": "@",
+           "type": "ds",
+           "rdata": {
+             "keyTag": "12345",
+             "algorithm": "13",
+             "digestType": "2",
+             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+           }
+         }
+       ],
+       "controls": {
+         "maximumSignatureLifetime": {
+           "ds": 86400
+         }
+       }
+     }
+   }
+
+4.5.  Authoritative DNS data
+
+   A server MAY support additional RR types, e.g. to support delegation-
+   less provisioning.  By doing this the registry operators name servers
+   becomes authoritative for the registered domain.  A server MUST
+   consider resource records designed for delegation - including DNSSEC
+   - and resource records representing authoritative data - except for
+   GLUE RR - mutual exclusive.
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 14]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+5.  Discoverability
+
+   The server MUST provide the following information per profile in the
+   discovery document in section 10 of
+   [I-D.draft-ietf-rpp-requirements]:
+
+   *  A list of supported resource record types
+
+   *  A list of applicable operational controls
+
+   *  Minimum, maximum and default values for operational controls
+
+   TODO: Needs rewrite after definition of the discovery document
+
+6.  EPP compatibility considerations
+
+   TODO
+
+7.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+8.  Security Considerations
+
+8.1.  Authoritative data
+
+   Allowing to store authoritative resource records (see section 4.4 of
+   this document) in the registry provides faster resolution.  However,
+   if not done properly situations may occur where the data served
+   authoritative should have been delegated.  RPP servers MUST take
+   precautions to not store authoritative and non-authoritative data at
+   the same time.
+
+   The types and number of authoritative records can result in
+   uncontrolled growth of the registries zone file and eventually
+   exhaust the hardware resources of the registries name server.  RPP
+   servers SHOULD consider limiting the amount of authoritative records
+   and carefully choose which record types are allowed.
+
+8.2.  Host references within the rdata field
+
+   Some RR types (NS, MX and others) use references to host names which
+   can be categorized into three categories:
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 15]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   Domain internal references are references to a subordinate host name
+   of the domain.  E.g. "ns.example.com" is an domain internal reference
+   when used as a name server for "example.com".
+
+   Registry internal references are references to a host name within the
+   same registry.  E.g. "ns.example.com" is an domain internal reference
+   when used as a name server for "example2.com".
+
+   Registry external references are references to a host name outside of
+   the registry.  E.g. "ns.example.net" is an domain internal reference
+   when used as a name server for "example.com".
+
+   Deletion of a host name while still being referenced may lead to
+   severe security risks for the referencing domain.
+
+9.  Change History
+
+9.1.  -00 to -01
+
+   *  Combined structure for resource record definition and operational
+      controls (Section 3.1.1).
+
+   *  Use camel case for property names instead of snake case.
+
+   *  Move examples or RR types to Appendix B.
+
+   *  Clarification tha RDATA presentation format is used.  Datatypes
+      for property values in RDATA are set to string.
+
+10.  IANA Considerations
+
+   This document has no IANA actions.
+
+11.  Appendix A.  Examples from current implementations
+
+11.1.  EPP
+
+11.1.1.  Create domain using host attributes example
+
+   EPP XML:
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 16]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="UTF-8"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <domain:create
+             xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+           <domain:name>example.com</domain:name>
+           <domain:period unit="y">1</domain:period>
+           <domain:ns>
+             <domain:hostAttr>
+               <domain:hostName>ns1.example.com</domain:hostName>
+               <domain:hostAddr ip="v4">192.0.2.1</domain:hostAddr>
+               <domain:hostAddr ip="v6">2001:db8::1</domain:hostAddr>
+             </domain:hostAttr>
+             <domain:hostAttr>
+               <domain:hostName>ns2.example.com</domain:hostName>
+               <domain:hostAddr ip="v4">192.0.2.2</domain:hostAddr>
+             </domain:hostAttr>
+           </domain:ns>
+           <domain:registrant>registrantID</domain:registrant>
+           <domain:contact type="admin">adminID</domain:contact>
+           <domain:contact type="tech">techID</domain:contact>
+         </domain:create>
+       </create>
+       <extension>
+         <secDNS:create
+             xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+           <secDNS:maxSigLife>604800</secDNS:maxSigLife>
+           <secDNS:dsData>
+             <secDNS:keyTag>12345</secDNS:keyTag>
+             <secDNS:alg>13</secDNS:alg>
+             <secDNS:digestType>2</secDNS:digestType>
+             <secDNS:digest>
+               BE74359954660069D5C632B56F120EE9F3A86764247
+             </secDNS:digest>
+           </secDNS:dsData>
+         </secDNS:create>
+         <ttl:create xmlns:ttl="urn:ietf:params:xml:ns:epp:ttl-1.0">
+           <ttl:ttl for="NS">3600</ttl:ttl>
+         </ttl:create>
+       </extension>
+       <clTRID>clTRID-1234</clTRID>
+     </command>
+   </epp>
+
+   RPP JSON representation:
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 17]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "...": "",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.com"
+           }
+         },
+         {
+           "name": "ns1.example.com",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "ns1.example.com",
+           "type": "aaaa",
+           "rdata": {
+             "address": "2001:db8::1"
+           }
+         },
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns2.example.com"
+           }
+         },
+         {
+           "name": "ns2.example.com",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.2"
+           }
+         },
+         {
+           "name": "@",
+           "type": "ds",
+           "rdata": {
+             "keyTag": "12345",
+             "algorithm": "13",
+             "digestType": "2",
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 18]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247"
+           }
+         }
+       ],
+       "controls": {
+         "maximumSignatureLifetime": {
+           "ds": 604800
+         },
+         "ttl": {
+           "ns": 3600
+         }
+       }
+     }
+   }
+
+11.1.2.  Create domain using host object example
+
+   EPP XML:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 19]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="UTF-8"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <domain:create
+             xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+           <domain:name>example.com</domain:name>
+           <domain:period unit="y">1</domain:period>
+           <domain:ns>
+             <domain:hostObj>ns1.example.net</domain:hostObj>
+             <domain:hostObj>ns2.example.net</domain:hostObj>
+           </domain:ns>
+           <domain:registrant>registrantID</domain:registrant>
+           <domain:contact type="admin">adminID</domain:contact>
+           <domain:contact type="tech">techID</domain:contact>
+         </domain:create>
+       </create>
+       <extension>
+         <secDNS:create
+             xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+           <secDNS:maxSigLife>604800</secDNS:maxSigLife>
+           <secDNS:dsData>
+             <secDNS:keyTag>12345</secDNS:keyTag>
+             <secDNS:alg>13</secDNS:alg>
+             <secDNS:digestType>2</secDNS:digestType>
+             <secDNS:digest>
+               BE74359954660069D5C632B56F120EE9F3A86764247C
+             </secDNS:digest>
+           </secDNS:dsData>
+         </secDNS:create>
+         <ttl:create xmlns:ttl="urn:ietf:params:xml:ns:epp:ttl-1.0">
+           <ttl:ttl for="NS">3600</ttl:ttl>
+         </ttl:create>
+       </extension>
+       <clTRID>clTRID-1234</clTRID>
+     </command>
+   </epp>
+
+   RPP JSON representation:
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 20]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "...": "",
+     "_object_references": {
+       "nameserver": [
+         {
+           "name": "ns1.example.net.",
+           "href": "https://rpp.example/nameservers/ns1.example.net",
+           "rel": "nameserver"
+         },
+         {
+           "name": "ns2.example.net.",
+           "href": "https://rpp.example/nameservers/ns2.example.net",
+           "rel": "nameserver"
+         }
+       ]
+     },
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ds",
+           "rdata": {
+             "keyTag": "12345",
+             "algorithm": "13",
+             "digestType": "2",
+             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+           }
+         }
+       ],
+       "controls": {
+         "maximumSignatureLifetime": {
+           "ds": 604800
+         },
+         "ttl": {
+           "ns": 3600
+         }
+       }
+     }
+   }
+
+11.1.3.  Create host object example
+
+   EPP XML:
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 21]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <host:create
+          xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+           <host:name>ns1.example.com</host:name>
+           <host:addr ip="v4">192.0.2.2</host:addr>
+           <host:addr ip="v4">192.0.2.29</host:addr>
+           <host:addr ip="v6">2001:db8::1</host:addr>
+         </host:create>
+       </create>
+       <clTRID>ABC-12345</clTRID>
+     </command>
+   </epp>
+
+   RPP JSON representation:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 22]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Host",
+     "...": "",
+     "name": "ns1.example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns.example.com"
+           }
+         },
+         {
+             "name": "@",
+             "type": "a",
+             "rdata": {
+                 "address": "192.0.2.2"
+             }
+         },
+         {
+             "name": "@",
+             "type": "a",
+             "rdata": {
+                 "address": "192.0.2.29"
+             }
+         },
+         {
+             "name": "@",
+             "type": "aaaa",
+             "rdata": {
+                 "address": "2001:db8::1"
+             }
+         }
+       ]
+     }
+   }
+
+11.2.  Free Registry for ENUM and Domains (FRED)
+
+   FRED is an open source registry software developed by CZ.NIC
+
+11.2.1.  Create domain example
+
+   EPP XML:
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 23]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="utf-8" standalone="no"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <domain:create
+             xmlns:domain="http://www.nic.cz/xml/epp/domain-1.4">
+           <domain:name>example.cz</domain:name>
+           <domain:registrant>registrantID</domain:registrant>
+           <domain:admin>adminID</domain:admin>
+           <domain:nsset>nssetID</domain:nsset>
+           <domain:keyset>keysetID</domain:keyset>
+         </domain:create>
+       </create>
+       <clTRID>clTRID-1234</clTRID>
+     </command>
+   </epp>
+
+11.2.2.  Create nsset example
+
+   EPP XML:
+
+   <?xml version="1.0" encoding="utf-8" standalone="no"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <nsset:create
+             xmlns:nsset="http://www.nic.cz/xml/epp/nsset-1.2">
+           <nsset:id>nssetID</nsset:id>
+           <nsset:ns>
+             <nsset:name>ns1.example.cz</nsset:name>
+             <nsset:addr>192.0.2.1</nsset:addr>
+             <nsset:addr>192.0.2.2</nsset:addr>
+           </nsset:ns>
+           <nsset:ns>
+             <nsset:name>nameserver-example.cz</nsset:name>
+           </nsset:ns>
+           <nsset:tech>techID</nsset:tech>
+           <nsset:reportlevel>1</nsset:reportlevel>
+         </nsset:create>
+       </create>
+       <clTRID>clTRID-1234</clTRID>
+     </command>
+   </epp>
+
+11.2.3.  Create keyset example
+
+   EPP XML:
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 24]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="utf-8" standalone="no"?>
+   <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+     <command>
+       <create>
+         <keyset:create
+             xmlns:keyset="http://www.nic.cz/xml/epp/keyset-1.3">
+           <keyset:id>keysetID</keyset:id>
+           <keyset:dnskey>
+             <keyset:flags>257</keyset:flags>
+             <keyset:protocol>3</keyset:protocol>
+             <keyset:alg>5</keyset:alg>
+             <keyset:pubKey>AwEAAddt2AkL4RJ9Ao6LCWheg8</keyset:pubKey>
+           </keyset:dnskey>
+           <keyset:dnskey>
+             <keyset:flags>257</keyset:flags>
+             <keyset:protocol>3</keyset:protocol>
+             <keyset:alg>5</keyset:alg>
+             <keyset:pubKey>AwEAAddt2AkL4RJ9Ao6LCWheg9</keyset:pubKey>
+           </keyset:dnskey>
+           <keyset:tech>techID</keyset:tech>
+         </keyset:create>
+       </create>
+       <clTRID>clTRID-1234</clTRID>
+     </command>
+   </epp>
+
+   RPP JSON representation:
+
+   TODO
+
+   {}
+
+11.3.  Realtime Registry Interface (RRI)
+
+   RRI is a proprietary protocol developed by DENIC
+
+11.3.1.  Create domain with name servers example
+
+   RRI XML:
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 25]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   <registry-request
+       xmlns="http://registry.denic.de/global/5.0"
+       xmlns:domain="http://registry.denic.de/domain/5.0"
+       xmlns:dnsentry="http://registry.denic.de/dnsentry/5.0">
+     <domain:create>
+       <domain:handle>example.de</domain:handle>
+       <domain:contact role="holder">registrantID</domain:contact>
+       <dnsentry:dnsentry xsi:type="dnsentry:NS">
+         <dnsentry:owner>example.de</dnsentry:owner>
+         <dnsentry:rdata>
+           <dnsentry:nameserver>ns1.example.com</dnsentry:nameserver>
+         </dnsentry:rdata>
+       </dnsentry:dnsentry>
+       <dnsentry:dnsentry xsi:type="dnsentry:NS">
+         <dnsentry:owner>example.de</dnsentry:owner>
+         <dnsentry:rdata>
+           <dnsentry:nameserver>ns1.example.de</dnsentry:nameserver>
+           <dnsentry:address>192.0.2.1</dnsentry:address>
+         </dnsentry:rdata>
+       </dnsentry:dnsentry>
+       <dnsentry:dnsentry xsi:type="dnsentry:DNSKEY">
+         <dnsentry:owner>example.de.</dnsentry:owner>
+         <dnsentry:rdata>
+           <dnsentry:flags>257</dnsentry:flags>
+           <dnsentry:protocol>3</dnsentry:protocol>
+           <dnsentry:algorithm>5</dnsentry:algorithm>
+           <dnsentry:publicKey>
+             AwEAAddt2AkL4RJ9Ao6LCWheg8
+           </dnsentry:publicKey>
+         </dnsentry:rdata>
+       </dnsentry:dnsentry>
+     </domain:create>
+     <ctid>clTRID-1234</ctid>
+   </registry-request>
+
+   RPP JSON representation:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 26]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.de",
+     "...": "",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.com"
+           }
+         },
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.de"
+           }
+         },
+         {
+           "name": "ns1.example.de",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         },
+         {
+           "name": "@",
+           "type": "dnskey",
+           "rdata": {
+             "flags": "257",
+             "protocol": "3",
+             "algorithm": "5",
+             "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+           }
+         }
+       ]
+     }
+   }
+
+11.3.2.  Create domain without delegation example
+
+   RRI XML:
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 27]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   <registry-request
+       xmlns="http://registry.denic.de/global/5.0"
+       xmlns:domain="http://registry.denic.de/domain/5.0"
+       xmlns:dnsentry="http://registry.denic.de/dnsentry/5.0">
+     <domain:update>
+       <domain:handle>example.de</domain:handle>
+       <domain:contact role="holder">registrantID</domain:contact>
+       <dnsentry:dnsentry xsi:type="dnsentry:A">
+         <dnsentry:owner>example.de</dnsentry:owner>
+         <dnsentry:rdata>
+           <dnsentry:address>192.0.2.1</dnsentry:address>
+         </dnsentry:rdata>
+       </dnsentry:dnsentry>
+     </domain:update>
+     <ctid>clTRID-1234</ctid>
+   </registry-request>
+
+   RPP JSON representation:
+
+   {
+     "@type": "Domain",
+     "name": "example.de",
+     "...": "",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         }
+       ]
+     }
+   }
+
+11.4.  RDAP
+
+11.4.1.  Domain object
+
+   Registration Data Access Protocol (RDAP) is described in [RFC9083].
+   An extention proposing Time-to-Live (TTL) values is described in
+   [I-D.draft-brown-rdap-ttl-extension] and is close to adoption in the
+   regext working group.
+
+   RDAP JSON:
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 28]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "objectClassName": "domain",
+     "ldhName": "example.com",
+     "nameservers": [
+       {
+         "objectClassName": "nameserver",
+         "ldhName": "ns1.example.com",
+         "ipAddresses": {
+           "v4": ["192.0.2.1"],
+           "v6": ["2001:db8::1"]
+         }
+       },
+       {
+         "objectClassName": "nameserver",
+         "ldhName": "ns2.example.com",
+         "ipAddresses": {
+           "v4": ["192.0.2.2"]
+         }
+       }
+     ],
+     "secureDNS": {
+       "delegationSigned": true,
+       "maxSigLife": 604800,
+       "dsData": [
+         {
+           "keyTag": 12345,
+           "algorithm": 13,
+           "digestType": 2,
+           "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+         }
+       ]
+     },
+     "ttl": [
+          {
+            "types": [ "NS" ],
+            "value": 3600
+          }
+     ],
+     "events": [
+       {
+         "eventAction": "registration",
+         "eventDate": "2025-01-01T00:00:00Z"
+       },
+       {
+         "eventAction": "expiration",
+         "eventDate": "2035-01-01T00:00:00Z"
+       }
+     ],
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 29]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+     "status": ["active"]
+   }
+
+12.  Appendix B.  Example Structures for RR Types
+
+12.1.  A ([RFC1035])
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "a",
+           "rdata": {
+             "address": "192.0.2.1"
+           }
+         }
+       ]
+     }
+   }
+
+12.2.  AAAA ([RFC3596])
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "ns.example.com.",
+           "type": "aaaa",
+           "rdata": {
+             "address": "2001:DB8::1"
+           }
+         }
+       ]
+     }
+   }
+
+12.3.  DNSKEY ([RFC4034])
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 30]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com.",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "dnskey",
+           "rdata": {
+             "flags": "257",
+             "protocol": "3",
+             "algorithm": "5",
+             "publicKey": "AwEAAddt2AkL4RJ9Ao6LCWheg8"
+           }
+         }
+       ]
+     }
+   }
+
+12.4.  DS ([RFC4034])
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ds",
+           "rdata": {
+             "keyTag": "12345",
+             "algorithm": "13",
+             "digestType": "2",
+             "digest": "BE74359954660069D5C632B56F120EE9F3A86764247C"
+           }
+         }
+       ]
+     }
+   }
+
+12.5.  NS ([RFC1035])
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 31]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "ns",
+           "rdata": {
+             "nsdname": "ns1.example.net."
+           }
+         }
+       ]
+     }
+   }
+
+12.6.  MX ([RFC1035])
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "mx",
+           "rdata": {
+             "preference": "10",
+             "exchange": "mx1.example.net"
+           }
+         }
+       ]
+     }
+   }
+
+12.7.  SVCB ([RFC9460])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 32]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "svcb",
+           "rdata": {
+             "svcPriority": "10",
+             "targetName": "svc.example.com",
+             "svcParams": {
+               "ipv4hint": "192.0.2.1",
+               "ipv6hint": "2001:DB8::1"
+             }
+           }
+         }
+       ]
+     }
+   }
+
+12.8.  TXT ([RFC1035])
+
+   {
+     "@type": "Domain",
+     "name": "example.com",
+     "dns": {
+       "records": [
+         {
+           "name": "@",
+           "type": "txt",
+           "rdata": {
+             "txtData": "v=spf1 -all"
+           }
+         }
+       ]
+     }
+   }
+
+13.  References
+
+13.1.  Normative References
+
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/rfc/rfc1035>.
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 33]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC3596]  Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
+              "DNS Extensions to Support IP Version 6", STD 88,
+              RFC 3596, DOI 10.17487/RFC3596, October 2003,
+              <https://www.rfc-editor.org/rfc/rfc3596>.
+
+   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Resource Records for the DNS Security Extensions",
+              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+   [RFC5731]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+              Domain Name Mapping", STD 69, RFC 5731,
+              DOI 10.17487/RFC5731, August 2009,
+              <https://www.rfc-editor.org/rfc/rfc5731>.
+
+   [RFC5732]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+              Host Mapping", STD 69, RFC 5732, DOI 10.17487/RFC5732,
+              August 2009, <https://www.rfc-editor.org/rfc/rfc5732>.
+
+   [RFC5910]  Gould, J. and S. Hollenbeck, "Domain Name System (DNS)
+              Security Extensions Mapping for the Extensible
+              Provisioning Protocol (EPP)", RFC 5910,
+              DOI 10.17487/RFC5910, May 2010,
+              <https://www.rfc-editor.org/rfc/rfc5910>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9083]  Hollenbeck, S. and A. Newton, "JSON Responses for the
+              Registration Data Access Protocol (RDAP)", STD 95,
+              RFC 9083, DOI 10.17487/RFC9083, June 2021,
+              <https://www.rfc-editor.org/rfc/rfc9083>.
+
+   [RFC9803]  Brown, G., "Extensible Provisioning Protocol (EPP) Mapping
+              for DNS Time-to-Live (TTL) Values", RFC 9803,
+              DOI 10.17487/RFC9803, June 2025,
+              <https://www.rfc-editor.org/rfc/rfc9803>.
+
+13.2.  Informative References
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 34]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   [I-D.draft-brown-rdap-ttl-extension]
+              Brown, G., "RDAP Extension for DNS Time-To-Live (TTL
+              Values)", Work in Progress, Internet-Draft, draft-brown-
+              rdap-ttl-extension-03, 17 June 2025,
+              <https://datatracker.ietf.org/doc/html/draft-brown-rdap-
+              ttl-extension-03>.
+
+   [I-D.draft-ietf-deleg]
+              April, T., Špaček, P., Weber, R., and Lawrence,
+              "Extensible Delegation for DNS", Work in Progress,
+              Internet-Draft, draft-ietf-deleg-04, 16 October 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-deleg-
+              04>.
+
+   [I-D.draft-ietf-rpp-requirements]
+              Wullink, M. and P. Kowalik, "RESTful Provisioning Protocol
+              (RPP) - Requirements", Work in Progress, Internet-Draft,
+              draft-ietf-rpp-requirements-02, 13 October 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-rpp-
+              requirements-02>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+   [RFC8484]  Hoffman, P. and P. McManus, "DNS Queries over HTTPS
+              (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
+              <https://www.rfc-editor.org/rfc/rfc8484>.
+
+   [RFC9250]  Huitema, C., Dickinson, S., and A. Mankin, "DNS over
+              Dedicated QUIC Connections", RFC 9250,
+              DOI 10.17487/RFC9250, May 2022,
+              <https://www.rfc-editor.org/rfc/rfc9250>.
+
+   [RFC9460]  Schwartz, B., Bishop, M., and E. Nygren, "Service Binding
+              and Parameter Specification via the DNS (SVCB and HTTPS
+              Resource Records)", RFC 9460, DOI 10.17487/RFC9460,
+              November 2023, <https://www.rfc-editor.org/rfc/rfc9460>.
+
+   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+              <https://www.rfc-editor.org/rfc/rfc9499>.
+
+Acknowledgments
+
+Authors' Addresses
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 35]
+
+Internet-Draft         RPP DNS data representation          October 2025
+
+
+   Christian Simmen
+   DENIC eG
+   Germany
+   Email: simmen@denic.de
+
+
+   Pawel Kowalik
+   DENIC eG
+   Germany
+   Email: pawel.kowalik@denic.de
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Simmen & Kowalik          Expires 23 April 2026                [Page 36]
