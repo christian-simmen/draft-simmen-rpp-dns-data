@@ -23,10 +23,10 @@ title: "DNS data representation for use in RESTful Provisioning Protocol (RPP)"
 abbrev: "RPP DNS data representation"
 category: info
 
-docname: draft-simmen-rpp-dns-data-00
+docname: draft-simmen-rpp-dns-data-02
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-07-07
+date: 2025-10-20
 consensus: false
 v: 3
 area: Applications and Real-Time
@@ -745,7 +745,7 @@ EPP XML:
         <host:name>ns1.example.com</host:name>
         <host:addr ip="v4">192.0.2.2</host:addr>
         <host:addr ip="v4">192.0.2.29</host:addr>
-        <host:addr ip="v6">1080:0:0:0:8:800:200C:417A</host:addr>
+        <host:addr ip="v6">2001:db8::1</host:addr>
       </host:create>
     </create>
     <clTRID>ABC-12345</clTRID>
@@ -787,7 +787,7 @@ RPP JSON representation:
           "name": "@",
           "type": "aaaa",
           "rdata": {
-              "address": "1080:0:0:0:8:800:200C:417A"
+              "address": "2001:db8::1"
           }
       }
     ]
